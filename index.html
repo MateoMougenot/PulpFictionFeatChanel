@@ -1,132 +1,253 @@
+index.html :
+
 <!doctype html>
+
 <html lang="fr">
 
+
+
 <head>
+
   <meta charset="UTF-8" />
+
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>chanelxpulpfiction</title>
+
 </head>
 
+
+
 <body>
+
   <div id="app">
+
     <!-- <a-scene>
+
       <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+
       <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+
       <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+
       <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+
       <a-sky color="#ECECEC"></a-sky>
+
     </a-scene> -->
 
+
+
     <a-scene>
+
       <a-assets>
+
         <img id="quilted-red"
+
           src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/textures/grid.png">
+
         <img id="dancer-shadow" src="https://cdn.pixabay.com/photo/2014/04/03/10/32/dancer-310890_1280.png">
+
       </a-assets>
 
+
+
       <a-entity id="rig" position="0 0 1">
+
         <a-camera wasd-controls="acceleration: 20; fly: false; adEnabled: true; wsEnabled: true;"
+
           look-controls></a-camera>
+
       </a-entity>
 
+
+
       <a-box id="room" position="0 2 0" width="4" height="4" depth="4" side="back"
+
         material="color: #8B0000; metalness: 0.3; roughness: 0.8;"
+
         animation__color="property: material.color; to: #000000; startEvents: reveal; dur: 2000">
+
       </a-box>
+
+
 
       <a-entity id="scene-1">
 
+
+
         <a-entity id="mallette-global" position="0 -1 -1"
+
           animation="property: position; to: 0 0.5 -1; dur: 3000; easing: easeOutCubic; delay: 1000"
+
           animation__rotate="property: rotation; to: 0 360 0; dur: 15000; loop: true; easing: linear">
+
+
 
           <a-box width="0.8" height="0.15" depth="0.5" color="#1a1a1a">
 
+
+
             <a-entity id="charniere" position="0 0.075 -0.25"
+
               animation="property: rotation; to: -110 0 0; dur: 1500; delay: 4000; easing: easeInOutQuad">
+
               <a-box width="0.8" height="0.05" depth="0.5" position="0 0.025 0.25" color="#222"></a-box>
+
             </a-entity>
+
+
 
             <a-entity id="montre-ascenseur" position="0 0 0"
+
               animation="property: position; to: 0 1 0; dur: 2500; delay: 5000; easing: easeOutQuad">
 
+
+
               <a-entity id="montre-redresseur" rotation="-90 0 0"
+
                 animation="property: rotation; from: -90 0 0; to: 0 0 0; dur: 2000; delay: 5500; easing: easeInOutCubic">
 
+
+
                 <a-entity id="montre-spinner"
+
                   animation="property: rotation; from: 0 0 0; to: 0 360 0; dur: 4000; loop: true; easing: linear; delay: 5000">
 
+
+
                   <a-circle radius="0.2" color="#FFF" material="side: double; metalness: 0.8; roughness: 0.1">
+
                     <a-ring radius-inner="0.19" radius-outer="0.21" color="#D4AF37"></a-ring>
+
                   </a-circle>
 
+
+
                 </a-entity>
+
               </a-entity>
+
             </a-entity>
 
+
+
           </a-box>
+
         </a-entity>
+
       </a-entity>
 
-      <a-entity id="phares-container" position="0 1.6 -20">
-  
-  <a-entity position="-0.8 0 0"
-            animation="property: position; to: -0.4 0 19.5; dur: 4000; delay: 9000; easing: easeInQuart">
-    <a-sphere radius="0.1" color="#FFF" material="shader: flat"
-              animation="property: radius; to: 0.8; dur: 4000; delay: 9000; easing: easeInQuart">
-    </a-sphere>
-    <a-light type="point" intensity="0" color="#FDFFD2"
-             animation="property: intensity; to: 20; dur: 4000; delay: 9000; easing: easeInQuart">
-    </a-light>
-  </a-entity>
 
-  <a-entity position="0.8 0 0"
-            animation="property: position; to: 0.4 0 19.5; dur: 4000; delay: 9000; easing: easeInQuart">
-    <a-sphere radius="0.1" color="#FFF" material="shader: flat"
-              animation="property: radius; to: 0.8; dur: 4000; delay: 9000; easing: easeInQuart">
-    </a-sphere>
-    <a-light type="point" intensity="0" color="#FDFFD2"
-             animation="property: intensity; to: 20; dur: 4000; delay: 9000; easing: easeInQuart">
-    </a-light>
-  </a-entity>
 
-</a-entity>
+      <!-- Conteneur pour les phares lumineux -->
 
-<a-plane id="flash" position="0 1.6 0.5" width="10" height="10" 
-         material="color: #FFF; opacity: 0; transparent: true; shader: flat"
-         animation="property: material.opacity; from: 0; to: 1; dur: 800; delay: 12500; easing: easeInExpo"
-         animation__out="property: material.opacity; from: 1; to: 0; dur: 1500; delay: 13300; easing: easeOutQuad">
-</a-plane>
+      <a-entity id="phares-container">
 
-      <a-entity id="scene-2" position="0 0 -1.5" visible="false" animation="property: visible; to: true; delay: 11300">
+        <!-- Sphère lumineuse gauche -->
+
+        <a-entity id="phare-left">
+
+          <a-sphere id="phare-left-sphere" radius="0.5" color="#FFF"
+
+                    material="shader: flat; emissive: #FFF">
+
+          </a-sphere>
+
+          <a-light id="phare-left-light" type="point" intensity="0" color="#FDFFD2"></a-light>
+
+        </a-entity>
+
+
+
+        <!-- Sphère lumineuse droite -->
+
+        <a-entity id="phare-right">
+
+          <a-sphere id="phare-right-sphere" radius="0.5" color="#FFF"
+
+                    material="shader: flat; emissive: #FFF">
+
+          </a-sphere>
+
+          <a-light id="phare-right-light" type="point" intensity="0" color="#FDFFD2"></a-light>
+
+        </a-entity>
+
+      </a-entity>
+
+
+
+      <!-- Flash blanc de transition -->
+
+      <a-plane id="flash" position="0 0 1.9" width="20" height="20"
+
+               material="color: #FFF; opacity: 0; transparent: true; shader: flat">
+
+      </a-plane>
+
+
+
+      <a-entity id="scene-2" position="0 0 -1.5" visible="false">
+
+
 
         <a-plane rotation="-90 0 0" width="4" height="2" position="0 0.01 0.5" color="#111"
+
           animation="property: material.color; to: #333; loop: true; dir: alternate; dur: 500">
+
         </a-plane>
 
+
+
         <a-image src="#dancer-shadow" position="-0.8 1.2 0" width="1.5" height="2.2" transparent="true"
+
           animation="property: rotation; to: 0 20 5; dur: 1000; dir: alternate; loop: true; easing: easeInOutSine">
+
         </a-image>
+
         <a-image src="#dancer-shadow" position="0.8 1.2 0" width="1.5" height="2.2" transparent="true" scale="-1 1 1"
+
           animation="property: rotation; to: 0 -20 -5; dur: 1100; dir: alternate; loop: true; easing: easeInOutSine">
+
         </a-image>
+
       </a-entity>
 
+
+
       <a-light type="ambient" color="#444"></a-light>
+
       <a-light type="directional" position="-1 2 1" intensity="0.5"></a-light>
+
+
 
     </a-scene>
 
+
+
     <script>
+
       // Petit script pour changer la couleur du cube au moment de l'éblouissement
+
       setTimeout(() => {
+
         document.querySelector('#room').emit('reveal');
+
         document.querySelector('#scene-1').setAttribute('visible', 'false');
+
       }, 11000);
+
     </script>
+
   </div>
+
   <script type="module" src="/src/main.js"></script>
+
 </body>
+
+
 
 </html>
