@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Pulp Fiction Experience</title>
+    <title>Chanel x Pulp Fiction Experience</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
       body { margin: 0; overflow: hidden; }
@@ -10,338 +10,513 @@
         position: fixed;
         top: 10px;
         left: 10px;
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.85);
         color: #0f0;
         padding: 10px;
         font-family: monospace;
-        font-size: 12px;
+        font-size: 11px;
         z-index: 1000;
-        max-width: 300px;
+        max-width: 280px;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #0f0;
+      }
+      #instructions {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: #fff;
+        padding: 15px 30px;
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 14px;
+        border-radius: 0;
+        border: 1px solid #FFD700;
+        z-index: 1000;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      #title {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        color: #FFD700;
+        font-family: 'Georgia', serif;
+        font-size: 18px;
+        font-style: italic;
+        z-index: 1000;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      }
+      #controls {
+        position: fixed;
+        bottom: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.6);
+        color: #aaa;
+        padding: 8px 15px;
+        font-family: monospace;
+        font-size: 11px;
+        z-index: 1000;
       }
     </style>
   </head>
   <body>
-    <div id="debug">Chargement...</div>
+    <div id="debug">Initialisation...</div>
+    <div id="controls">ZQSD / ←↑↓→ : se déplacer • Souris : regarder</div>
+    <div id="instructions">Cliquez sur le $5 Shake</div>
+    <div id="title">CHANEL × Pulp Fiction</div>
 
     <a-scene>
       
       <a-assets>
-        <img id="dancer" src="https://cdn.pixabay.com/photo/2014/04/03/10/32/dancer-310890_1280.png" crossorigin="anonymous">
+        <img id="dancer1" src="https://cdn.pixabay.com/photo/2014/04/03/10/32/dancer-310890_1280.png" crossorigin="anonymous">
+        
+        <!-- 
+        ============================================
+        POLY PIZZA - COMMENT AJOUTER DES MODÈLES 3D
+        ============================================
+        
+        1. Allez sur https://poly.pizza
+        2. Cherchez un modèle (ex: "briefcase", "milkshake", "booth")
+        3. Téléchargez le format GLB (recommandé) ou GLTF
+        4. Hébergez le fichier (GitHub, votre serveur, etc.)
+        5. Ajoutez-le ici dans <a-assets> :
+        
+        <a-asset-item id="briefcase-model" src="URL_VERS_VOTRE_FICHIER.glb"></a-asset-item>
+        <a-asset-item id="milkshake-model" src="URL_VERS_VOTRE_FICHIER.glb"></a-asset-item>
+        <a-asset-item id="booth-model" src="URL_VERS_VOTRE_FICHIER.glb"></a-asset-item>
+        <a-asset-item id="jukebox-model" src="URL_VERS_VOTRE_FICHIER.glb"></a-asset-item>
+        
+        6. Puis utilisez-les dans la scène :
+        
+        <a-entity gltf-model="#briefcase-model" position="0 0 -1.5" scale="0.5 0.5 0.5"></a-entity>
+        
+        CONSEIL: Ajustez scale et position selon la taille du modèle
+        ============================================
+        -->
+        
       </a-assets>
 
-      <!-- Caméra avec mouvement libre à la souris -->
-      <a-entity id="rig" position="0 0 0" 
-                wasd-controls="acceleration: 30">
-        <a-camera id="cam" position="0 1.6 0">
+      <!-- CAMÉRA AVEC DÉPLACEMENT ZQSD/FLÈCHES -->
+      <a-entity id="rig" position="0 0 1.5"
+                movement-controls="controls: keyboard"
+                wasd-controls="acceleration: 20; wsAxis: z; adAxis: x">
+        <a-camera id="cam" 
+                  position="0 1.6 0"
+                  look-controls="enabled: true; pointerLockEnabled: true">
           <a-cursor 
             id="cursor"
-            color="#FF0000"
-            raycaster="objects: .clickable; far: 10"
-            fuse="false">
+            color="#FFD700"
+            opacity="0.8"
+            raycaster="objects: .clickable; far: 15"
+            fuse="false"
+            animation__scale="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true">
           </a-cursor>
           
-          <!-- Rideau noir attaché à la caméra -->
-          <a-plane id="black-out" position="0 0 -0.5" width="4" height="4" 
+          <!-- Black-out pour transition -->
+          <a-plane id="black-out" position="0 0 -0.3" width="6" height="6" 
                    material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" 
                    visible="false">
           </a-plane>
         </a-camera>
       </a-entity>
 
-      <a-box id="room" position="0 2 0" width="4" height="4" depth="4" 
-             material="color: #111; metalness: 0.2; roughness: 0.8; side: back">
+      <!-- Cube principal (salle) - AGRANDI pour exploration -->
+      <a-box id="room" position="0 3 0" width="8" height="6" depth="8" 
+             material="color: #1a0a0a; metalness: 0.3; roughness: 0.7; side: back">
       </a-box>
 
-      <!-- SCÈNE A : Jack Rabbit Slim's -->
-      <a-entity id="scene-a">
-        <a-image src="#dancer" position="-0.8 1.2 -1.5" width="1.2" height="1.8" transparent="true"
-                 animation="property: rotation; to: 0 20 5; dur: 1000; dir: alternate; loop: true"></a-image>
-        <a-image src="#dancer" position="0.8 1.2 -1.5" width="1.2" height="1.8" transparent="true" scale="-1 1 1"
-                 animation="property: rotation; to: 0 -20 -5; dur: 1100; dir: alternate; loop: true"></a-image>
+      <!-- Sol réel pour marcher -->
+      <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="8" height="8"
+               material="color: #1a1a1a; metalness: 0.5; roughness: 0.5">
+      </a-plane>
 
-        <!-- Milkshake AVEC GÉOMÉTRIE CLIQUABLE -->
-        <a-entity id="trigger-milkshake" class="clickable" position="0 0.8 -1.2">
-          <!-- Hitbox invisible plus grande -->
+      <!-- ========== SCÈNE A : JACK RABBIT SLIM'S ========== -->
+      <a-entity id="scene-a">
+        
+        <!-- DANCEFLOOR DAMIER (agrandi) -->
+        <a-entity id="dancefloor" position="0 0.01 -1">
+          <!-- Génération du damier 6x6 -->
+          <!-- Rangée 1 -->
+          <a-box position="-1.25 0 -1.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.75 0 -1.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.25 0 -1.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.25 0 -1.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.75 0 -1.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="1.25 0 -1.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <!-- Rangée 2 -->
+          <a-box position="-1.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.75 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.75 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="1.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <!-- Rangée 3 -->
+          <a-box position="-1.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.75 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.75 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="1.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <!-- Rangée 4 -->
+          <a-box position="-1.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.75 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.75 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="1.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <!-- Rangée 5 -->
+          <a-box position="-1.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="1.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <!-- Rangée 6 -->
+          <a-box position="-1.25 0 1.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.75 0 1.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="-0.25 0 1.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.25 0 1.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="0.75 0 1.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
+          <a-box position="1.25 0 1.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
+        </a-entity>
+
+        <!-- DANSEURS (Vincent & Mia) sur le dancefloor -->
+        <a-entity id="dancers" position="0 0 -1">
+          <!-- Mia -->
+          <a-entity id="mia" position="-0.7 0 0">
+            <a-image src="#dancer1" position="0 1 0" width="1" height="1.6" transparent="true" opacity="0.9"
+                     animation__twist="property: rotation; from: 0 -15 -4; to: 0 15 4; dur: 700; dir: alternate; loop: true; easing: easeInOutSine">
+            </a-image>
+          </a-entity>
+          
+          <!-- Vincent -->
+          <a-entity id="vincent" position="0.7 0 0">
+            <a-image src="#dancer1" position="0 1 0" width="1" height="1.6" transparent="true" opacity="0.9" scale="-1 1 1"
+                     animation__twist="property: rotation; from: 0 15 4; to: 0 -15 -4; dur: 750; dir: alternate; loop: true; easing: easeInOutSine">
+            </a-image>
+          </a-entity>
+        </a-entity>
+
+        <!-- BOOTH ROUGE (côté droit) -->
+        <a-entity id="booth-right" position="3 0 0" rotation="0 -90 0">
+          <a-box position="0 0.4 0" width="2.5" height="0.15" depth="0.7" color="#8B0000" 
+                 material="metalness: 0.1; roughness: 0.8"></a-box>
+          <a-box position="0 0.9 0.3" width="2.5" height="0.8" depth="0.1" color="#8B0000"
+                 material="metalness: 0.1; roughness: 0.8"></a-box>
+          <!-- Table -->
+          <a-cylinder position="0 0.65 -0.5" radius="0.45" height="0.05" color="#222"
+                      material="metalness: 0.9; roughness: 0.1"></a-cylinder>
+          <a-cylinder position="0 0.35 -0.5" radius="0.06" height="0.65" color="#888"
+                      material="metalness: 0.9; roughness: 0.1"></a-cylinder>
+        </a-entity>
+
+        <!-- BOOTH ROUGE (côté gauche) -->
+        <a-entity id="booth-left" position="-3 0 0" rotation="0 90 0">
+          <a-box position="0 0.4 0" width="2.5" height="0.15" depth="0.7" color="#8B0000" 
+                 material="metalness: 0.1; roughness: 0.8"></a-box>
+          <a-box position="0 0.9 0.3" width="2.5" height="0.8" depth="0.1" color="#8B0000"
+                 material="metalness: 0.1; roughness: 0.8"></a-box>
+          <!-- Table avec le MILKSHAKE -->
+          <a-cylinder position="0 0.65 -0.5" radius="0.45" height="0.05" color="#222"
+                      material="metalness: 0.9; roughness: 0.1"></a-cylinder>
+          <a-cylinder position="0 0.35 -0.5" radius="0.06" height="0.65" color="#888"
+                      material="metalness: 0.9; roughness: 0.1"></a-cylinder>
+        </a-entity>
+
+        <!-- MILKSHAKE $5 (sur la table de gauche) -->
+        <a-entity id="trigger-milkshake" class="clickable" position="-2.5 0.75 0">
+          <!-- Hitbox -->
           <a-box class="clickable" width="0.3" height="0.5" depth="0.3" 
                  material="opacity: 0; transparent: true"></a-box>
           
-          <a-cylinder radius="0.1" height="0.3" color="#FFB6C1"></a-cylinder>
-          <a-cone radius-bottom="0.1" radius-top="0.02" height="0.1" position="0 0.2 0" color="#FFF"></a-cone>
-          <a-light type="point" intensity="0.5" distance="2" color="#FFB6C1"></a-light>
+          <!-- 
+          ==========================================
+          REMPLACEZ CE BLOC PAR UN MODÈLE POLY PIZZA:
+          <a-entity gltf-model="#milkshake-model" scale="0.3 0.3 0.3"></a-entity>
+          ==========================================
+          -->
           
-          <a-text value="$5 SHAKE\nCLICK ME" position="0 0.6 0" align="center" 
-                  scale="0.4 0.4 0.4" color="#FFF" width="2"></a-text>
+          <!-- Verre tulipe (placeholder) -->
+          <a-cylinder radius="0.06" height="0.22" position="0 0.05 0" color="#FADADD"
+                      material="metalness: 0.2; roughness: 0.3; opacity: 0.9; transparent: true">
+          </a-cylinder>
+          <a-sphere radius="0.07" position="0 0.18 0" color="#FFF5F5"></a-sphere>
+          <a-sphere radius="0.015" position="0 0.25 0" color="#DC143C"
+                    material="metalness: 0.3; roughness: 0.5"></a-sphere>
+          <a-cylinder radius="0.008" height="0.2" position="0.03 0.2 0" rotation="0 0 10" color="#FF69B4"></a-cylinder>
+          
+          <a-light type="point" intensity="0.6" distance="1.5" color="#FFB6C1"></a-light>
+          
+          <a-text value="$5" position="0 0.4 0" align="center" 
+                  scale="0.4 0.4 0.4" color="#FFD700" 
+                  animation__float="property: position; from: 0 0.4 0; to: 0 0.45 0; dur: 1000; dir: alternate; loop: true">
+          </a-text>
         </a-entity>
 
-        <a-light type="ambient" color="#555" intensity="0.8"></a-light>
-        <a-light type="spot" position="0 3.8 -1.5" rotation="-90 0 0" intensity="1.2" color="#FFF"></a-light>
+        <!-- JUKEBOX (fond de salle) -->
+        <!-- 
+        REMPLACEZ PAR UN MODÈLE POLY PIZZA:
+        <a-entity gltf-model="#jukebox-model" position="0 0 -3.5" scale="1 1 1"></a-entity>
+        -->
+        <a-entity id="jukebox" position="0 0 -3.5">
+          <a-box position="0 0.8 0" width="0.8" height="1.5" depth="0.5" color="#8B4513"
+                 material="metalness: 0.3; roughness: 0.6"></a-box>
+          <a-box position="0 1.4 0.1" width="0.6" height="0.5" depth="0.1" color="#222"
+                 material="metalness: 0.8; roughness: 0.2"></a-box>
+          <!-- Lumières du jukebox -->
+          <a-light type="point" intensity="0.5" distance="2" color="#FF6347" position="0 1.5 0.3"
+                   animation__juke="property: color; from: #FF6347; to: #00CED1; dur: 2000; dir: alternate; loop: true"></a-light>
+        </a-entity>
+
+        <!-- BAR (fond) -->
+        <a-entity id="bar" position="0 0 3.5">
+          <a-box position="0 0.55 0" width="4" height="1.1" depth="0.5" color="#4a3728"
+                 material="metalness: 0.2; roughness: 0.7"></a-box>
+          <!-- Comptoir -->
+          <a-box position="0 1.15 0" width="4.2" height="0.08" depth="0.6" color="#2a1a0a"
+                 material="metalness: 0.4; roughness: 0.5"></a-box>
+          <!-- Tabourets -->
+          <a-entity position="-1.2 0 -0.6">
+            <a-cylinder radius="0.15" height="0.05" position="0 0.7 0" color="#8B0000"></a-cylinder>
+            <a-cylinder radius="0.03" height="0.65" position="0 0.35 0" color="#888"></a-cylinder>
+          </a-entity>
+          <a-entity position="0 0 -0.6">
+            <a-cylinder radius="0.15" height="0.05" position="0 0.7 0" color="#8B0000"></a-cylinder>
+            <a-cylinder radius="0.03" height="0.65" position="0 0.35 0" color="#888"></a-cylinder>
+          </a-entity>
+          <a-entity position="1.2 0 -0.6">
+            <a-cylinder radius="0.15" height="0.05" position="0 0.7 0" color="#8B0000"></a-cylinder>
+            <a-cylinder radius="0.03" height="0.65" position="0 0.35 0" color="#888"></a-cylinder>
+          </a-entity>
+        </a-entity>
+
+        <!-- NÉONS DÉCORATIFS -->
+        <a-entity position="0 4.5 -3.8">
+          <a-text value="JACK RABBIT SLIM'S" align="center" color="#FF1493" 
+                  scale="0.6 0.6 0.6" font="mozillavr">
+          </a-text>
+          <a-light type="point" intensity="1" distance="4" color="#FF1493" position="0 0 0.1"></a-light>
+        </a-entity>
+
+        <a-entity position="-3.8 3 0" rotation="0 90 0">
+          <a-text value="♪ TWIST CONTEST ♪" align="center" color="#00CED1" 
+                  scale="0.3 0.3 0.3"
+                  animation__pulse="property: material.opacity; from: 0.7; to: 1; dur: 500; dir: alternate; loop: true">
+          </a-text>
+          <a-light type="point" intensity="0.6" distance="3" color="#00CED1"></a-light>
+        </a-entity>
+
+        <a-entity position="3.8 3 0" rotation="0 -90 0">
+          <a-text value="★ SINCE 1950 ★" align="center" color="#FFD700" 
+                  scale="0.3 0.3 0.3"
+                  animation__pulse="property: material.opacity; from: 0.7; to: 1; dur: 600; dir: alternate; loop: true">
+          </a-text>
+          <a-light type="point" intensity="0.6" distance="3" color="#FFD700"></a-light>
+        </a-entity>
+
+        <!-- ÉCLAIRAGE AMBIANCE DINER -->
+        <a-light type="ambient" color="#331111" intensity="0.3"></a-light>
+        
+        <!-- Spot principal dancefloor -->
+        <a-light type="spot" position="0 5.8 -1" rotation="-90 0 0" 
+                 intensity="2" color="#FFFAF0" angle="40" penumbra="0.4">
+        </a-light>
+        
+        <!-- Spots colorés -->
+        <a-light type="point" position="-2 4 -2" intensity="0.7" color="#FF1493" distance="5"
+                 animation__c1="property: intensity; from: 0.5; to: 0.9; dur: 1500; dir: alternate; loop: true"></a-light>
+        <a-light type="point" position="2 4 -2" intensity="0.7" color="#00CED1" distance="5"
+                 animation__c2="property: intensity; from: 0.9; to: 0.5; dur: 1500; dir: alternate; loop: true"></a-light>
+        <a-light type="point" position="0 4 2" intensity="0.5" color="#FFD700" distance="4"></a-light>
+
       </a-entity>
 
-      <!-- SCÈNE B : La Mallette -->
+      <!-- ========== SCÈNE B : LA MALLETTE ========== -->
       <a-entity id="scene-b" visible="false">
-        <a-entity id="briefcase" position="0 0.1 -1.5">
-          <!-- Base de la mallette (partie fixe) -->
-          <a-box id="briefcase-bottom" width="0.8" height="0.1" depth="0.5" color="#4a4a4a"
-                 material="metalness: 0.6; roughness: 0.4"></a-box>
+        
+        <!-- 
+        REMPLACEZ PAR UN MODÈLE POLY PIZZA:
+        <a-entity gltf-model="#briefcase-model" position="0 0.6 -1.5" scale="2 2 2"></a-entity>
+        -->
+        
+        <a-entity id="briefcase" position="0 0.6 -1.5">
+          <a-box id="briefcase-bottom" width="0.8" height="0.12" depth="0.5" color="#1a1a1a"
+                 material="metalness: 0.8; roughness: 0.2">
+            <a-box position="-0.28 0.07 0.26" width="0.06" height="0.015" depth="0.015" color="#D4AF37"
+                   material="metalness: 1; roughness: 0.1"></a-box>
+            <a-box position="0.28 0.07 0.26" width="0.06" height="0.015" depth="0.015" color="#D4AF37"
+                   material="metalness: 1; roughness: 0.1"></a-box>
+            <a-text value="CC" position="0 0.065 0.251" align="center"
+                    color="#D4AF37" scale="0.08 0.08 0.08"></a-text>
+          </a-box>
           
-          <!-- Charnière (point de pivot au fond de la mallette) -->
-          <a-entity id="briefcase-hinge" position="0 0.05 -0.25">
-            <!-- Couvercle qui pivote autour de la charnière -->
+          <a-entity id="briefcase-hinge" position="0 0.06 -0.25" rotation="-115 0 0">
             <a-box id="briefcase-lid" 
                    width="0.8" height="0.05" depth="0.5" 
                    position="0 0 0.25" 
-                   rotation="0 0 0"
-                   color="#555"
-                   material="metalness: 0.6; roughness: 0.4">
+                   color="#1a1a1a"
+                   material="metalness: 0.8; roughness: 0.2">
             </a-box>
           </a-entity>
           
-          <!-- Lumière dorée (invisible au début, apparaît à l'ouverture) -->
-          <a-light id="golden-light" type="point" intensity="0" color="#FFD700" position="0 0.2 0" distance="8"></a-light>
+          <a-box id="golden-interior" width="0.7" height="0.01" depth="0.4" position="0 0.065 0" 
+                 material="color: #FFD700; shader: flat; emissive: #FFD700; emissiveIntensity: 8"></a-box>
           
-          <!-- Intérieur lumineux (invisible au début) -->
-          <a-box id="golden-interior" width="0.6" height="0.01" depth="0.3" position="0 0.06 0" 
-                 material="color: #FFD700; shader: flat; emissive: #FFD700; emissiveIntensity: 0; opacity: 0; transparent: true"></a-box>
+          <a-light id="golden-light" type="point" intensity="10" color="#FFD700" position="0 0.5 0" distance="15"
+                   animation__pulse="property: intensity; from: 8; to: 14; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine">
+          </a-light>
+          <a-light type="point" intensity="3" color="#FFA500" position="0 0.2 0" distance="6"></a-light>
         </a-entity>
 
-        <!-- LUMIÈRES AMBIANTES POUR VOIR LA SCÈNE -->
-        <a-light type="ambient" color="#888" intensity="1.5"></a-light>
-        <a-light type="directional" position="2 4 2" intensity="1.2" color="#aaa"></a-light>
-        <a-light type="point" position="0 2 0" intensity="1.5" color="#999" distance="8"></a-light>
-        <a-light type="point" position="-2 2 -2" intensity="0.8" color="#777" distance="6"></a-light>
+        <a-text id="mystery-text" value="What's in the box?" position="0 3 -2" align="center" 
+                color="#FFD700" scale="0.6 0.6 0.6" opacity="0">
+        </a-text>
+
+        <a-light type="ambient" color="#111" intensity="0.1"></a-light>
         
-        <a-text id="mystery-text" value="" position="0 1.8 -2" align="center" color="#FFD700" scale="0.8 0.8 0.8"></a-text>
       </a-entity>
 
     </a-scene>
 
     <script>
-      // Composant mouse-look SIMPLE qui fonctionne
-      AFRAME.registerComponent('mouse-look', {
-        schema: { sensitivity: { default: 1.5 } },
-        
-        init: function() {
-          this.yaw = 0;
-          this.pitch = 0;
-          this.onMouseMove = this.onMouseMove.bind(this);
-          
-          document.addEventListener('mousemove', this.onMouseMove);
-          console.log('✅ Mouse-look activé');
-        },
-
-        onMouseMove: function(e) {
-          if (!e.movementX && !e.movementY) return;
-          
-          this.yaw -= e.movementX * this.data.sensitivity * 0.002;
-          this.pitch -= e.movementY * this.data.sensitivity * 0.002;
-          this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch));
-        },
-
-        tick: function() {
-          if (!this.el || !this.el.object3D) return;
-          
-          const rotation = this.el.object3D.rotation;
-          rotation.order = 'YXZ';
-          rotation.y = this.yaw;
-          rotation.x = this.pitch;
-        },
-
-        remove: function() {
-          document.removeEventListener('mousemove', this.onMouseMove);
-        }
-      });
-
       function updateDebug(msg) {
         const d = document.getElementById('debug');
-        if (d) d.innerHTML += '<br>' + msg;
+        if (d) {
+          d.innerHTML += `<br>${msg}`;
+          d.scrollTop = d.scrollHeight;
+        }
         console.log(msg);
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-        updateDebug('DOM chargé');
+        updateDebug('🎬 Chanel x Pulp Fiction');
+        updateDebug('─────────────────');
         
         const scene = document.querySelector('a-scene');
         
         scene.addEventListener('loaded', () => {
-          updateDebug('✅ Scène loaded');
-          
-          // Activer le mouse-look
-          const camera = document.querySelector('#cam');
-          camera.setAttribute('mouse-look', 'sensitivity: 1.5');
+          updateDebug('✅ Scène chargée');
+          updateDebug('🎮 ZQSD/Flèches activés');
           
           const milkshake = document.querySelector('#trigger-milkshake');
           const blackOut = document.querySelector('#black-out');
           const sceneA = document.querySelector('#scene-a');
           const sceneB = document.querySelector('#scene-b');
           const room = document.querySelector('#room');
+          const floor = document.querySelector('#floor');
           const cursor = document.querySelector('#cursor');
+          const instructions = document.getElementById('instructions');
+          const controls = document.getElementById('controls');
+          const mysteryText = document.querySelector('#mystery-text');
 
-          if (!milkshake) {
-            updateDebug('❌ Milkshake introuvable');
-            return;
-          }
+          let transitionDone = false;
 
-          updateDebug('✅ Milkshake trouvé');
-
-          let transitionDone = false; // FLAG pour empêcher la double transition
-
-          // MÉTHODE 1: Via le curseur A-Frame
           cursor.addEventListener('click', (evt) => {
-            if (transitionDone) {
-              updateDebug('⚠️ Transition déjà effectuée');
-              return;
-            }
+            if (transitionDone) return;
             
-            updateDebug('🖱️ Curseur cliqué');
-            const intersected = evt.detail.intersection;
-            if (intersected) {
-              let el = intersected.object.el;
-              while (el && !el.classList.contains('clickable')) {
-                el = el.parentNode?.el;
+            const intersectedEl = evt.detail.intersectedEl;
+            if (intersectedEl) {
+              let el = intersectedEl;
+              while (el && el.id !== 'trigger-milkshake') {
+                el = el.parentElement;
               }
               if (el && el.id === 'trigger-milkshake') {
-                updateDebug('🎬 MILKSHAKE CLIQUÉ !');
+                updateDebug('🥤 $5 Shake cliqué !');
                 transitionToSceneB();
               }
             }
           });
 
-          // MÉTHODE 2: Directement sur l'entité
           milkshake.addEventListener('click', () => {
-            if (transitionDone) {
-              updateDebug('⚠️ Transition déjà effectuée');
-              return;
-            }
-            updateDebug('🎬 MILKSHAKE EVENT !');
+            if (transitionDone) return;
+            updateDebug('🥤 Shake (direct)');
             transitionToSceneB();
           });
 
           function transitionToSceneB() {
-            if (transitionDone) return; // Double sécurité
+            if (transitionDone) return;
             transitionDone = true;
             
-            updateDebug('🎞️ Transition START');
+            updateDebug('─────────────────');
+            updateDebug('🎞️ CUT !');
 
-            // DÉSACTIVER le milkshake immédiatement
+            if (instructions) instructions.innerHTML = 'THE MYSTERY';
+            if (controls) controls.style.display = 'none';
+
             milkshake.classList.remove('clickable');
-            milkshake.setAttribute('visible', 'false');
 
             blackOut.setAttribute('visible', 'true');
-            blackOut.setAttribute('animation', {
+            blackOut.setAttribute('animation__fadeIn', {
               property: 'material.opacity',
               from: 0,
               to: 1,
-              dur: 400,
+              dur: 200,
               easing: 'easeInQuad'
             });
 
             setTimeout(() => {
-              updateDebug('🔄 Swap scènes');
+              updateDebug('🔄 Changement de scène');
               
               sceneA.setAttribute('visible', 'false');
               sceneB.setAttribute('visible', 'true');
               
               room.setAttribute('material', {
-                color: '#1a1a1a',
-                metalness: 0.5,
-                roughness: 0.5,
+                color: '#050505',
+                metalness: 0.95,
+                roughness: 0.05,
                 side: 'back'
               });
 
+              floor.setAttribute('material', {
+                color: '#030303',
+                metalness: 0.9,
+                roughness: 0.1
+              });
+
+              // Repositionner le joueur
+              const rig = document.querySelector('#rig');
+              rig.setAttribute('position', '0 0 1.5');
+
               setTimeout(() => {
-                blackOut.setAttribute('animation', {
+                blackOut.setAttribute('animation__fadeOut', {
                   property: 'material.opacity',
                   from: 1,
                   to: 0,
-                  dur: 1000,
-                  easing: 'easeOutQuad'
+                  dur: 1500,
+                  easing: 'easeOutCubic'
                 });
 
                 setTimeout(() => {
+                  mysteryText.setAttribute('animation__appear', {
+                    property: 'opacity',
+                    from: 0,
+                    to: 0.9,
+                    dur: 2000,
+                    easing: 'easeOutQuad'
+                  });
+                }, 800);
+
+                setTimeout(() => {
                   blackOut.setAttribute('visible', 'false');
-                  updateDebug('✅ Transition DONE');
+                  updateDebug('✅ Révélation');
+                  updateDebug('💼 La Mallette...');
                   
-                  // DÉCLENCHER L'ANIMATION D'OUVERTURE
                   setTimeout(() => {
-                    openBriefcase();
-                  }, 500);
-                }, 1000);
-              }, 100);
+                    if (instructions) instructions.style.opacity = '0';
+                  }, 3000);
+                  
+                }, 1600);
+                
+              }, 150);
 
-            }, 400);
+            }, 250);
           }
 
-          function openBriefcase() {
-            updateDebug('💼 Ouverture de la mallette...');
-            
-            const hinge = document.querySelector('#briefcase-hinge');
-            const goldenLight = document.querySelector('#golden-light');
-            const goldenInterior = document.querySelector('#golden-interior');
-            const mysteryText = document.querySelector('#mystery-text');
-            
-            // 1. Animation de la charnière (rotation de 0° à -120°)
-            hinge.setAttribute('animation__open', {
-              property: 'rotation',
-              from: '0 0 0',
-              to: '-120 0 0',
-              dur: 2000,
-              easing: 'easeInOutCubic'
-            });
-            
-            // 2. Apparition progressive de la lumière dorée
-            setTimeout(() => {
-              goldenLight.setAttribute('animation__intensity', {
-                property: 'intensity',
-                from: 0,
-                to: 10,
-                dur: 1500,
-                easing: 'easeOutQuad'
-              });
-              
-              goldenLight.setAttribute('animation__pulse', {
-                property: 'intensity',
-                from: 8,
-                to: 12,
-                dur: 1000,
-                dir: 'alternate',
-                loop: true,
-                delay: 1500
-              });
-              
-              // 3. Intérieur lumineux devient visible
-              goldenInterior.setAttribute('animation__opacity', {
-                property: 'material.opacity',
-                from: 0,
-                to: 1,
-                dur: 1000,
-                easing: 'easeInQuad'
-              });
-              
-              goldenInterior.setAttribute('animation__emissive', {
-                property: 'material.emissiveIntensity',
-                from: 0,
-                to: 8,
-                dur: 1000,
-                easing: 'easeInQuad'
-              });
-              
-              updateDebug('💡 Lumière dorée activée');
-              
-            }, 800);
-            
-            // 4. Texte apparaît après l'ouverture complète
-            setTimeout(() => {
-              mysteryText.setAttribute('value', "What's in the box?");
-              mysteryText.setAttribute('animation__fade', {
-                property: 'material.opacity',
-                from: 0,
-                to: 1,
-                dur: 1500
-              });
-              updateDebug('✅ Mallette ouverte !');
-              updateDebug('✅ Caméra devrait être libre');
-            }, 2500);
-          }
+          updateDebug('✅ Prêt');
+          updateDebug('👆 Approchez du shake');
         });
       });
     </script>
