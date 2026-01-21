@@ -60,13 +60,59 @@
         font-size: 11px;
         z-index: 1000;
       }
+      /* Écran de démarrage (requis pour l'audio) */
+      #start-experience {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        cursor: pointer;
+      }
+      #start-experience h1 {
+        color: #FFD700;
+        font-family: 'Georgia', serif;
+        font-size: 48px;
+        font-style: italic;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 8px rgba(255,215,0,0.5);
+      }
+      #start-experience p {
+        color: #fff;
+        font-family: 'Helvetica Neue', sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
     </style>
   </head>
   <body>
+    <!-- Écran de démarrage -->
+    <div id="start-experience">
+      <h1>CHANEL × Pulp Fiction</h1>
+      <p>Cliquez pour entrer</p>
+    </div>
+
     <div id="debug">Initialisation...</div>
     <div id="controls">ZQSD / ←↑↓→ : se déplacer • Souris : regarder • VR : Gâchette pour interagir</div>
     <div id="instructions">Cliquez sur le $5 Shake</div>
     <div id="title">CHANEL × Pulp Fiction</div>
+
+    <!-- Audio -->
+    <audio id="twist-music" loop preload="auto">
+      <source src="./assets/song/You Never Can Tell.mp3" type="audio/mpeg">
+    </audio>
 
     <a-scene vr-mode-ui="enabled: true">
       
@@ -76,15 +122,12 @@
         <a-asset-item id="speaker-model" src="./assets/models/Speaker.glb"></a-asset-item>
       </a-assets>
 
-      <!-- ========== CAMERA RIG (Desktop + VR) ========== -->
+      <!-- ========== CAMERA RIG ========== -->
       <a-entity id="rig" position="0 0 0"
                 wasd-controls="acceleration: 20"
                 constrain-position="min: -1.7 0 -1.7; max: 1.7 0 1.7">
         
-        <!-- Caméra -->
         <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
-          
-          <!-- Curseur pour Desktop (caché en VR) -->
           <a-entity id="desktop-cursor"
                     cursor="fuse: false; rayOrigin: mouse"
                     raycaster="objects: .clickable; far: 10">
@@ -93,20 +136,18 @@
             </a-ring>
           </a-entity>
           
-          <!-- Black-out pour transition -->
           <a-plane id="black-out" position="0 0 -0.3" width="6" height="6" 
                    material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" visible="false">
           </a-plane>
         </a-camera>
 
-        <!-- ========== MANETTE GAUCHE ========== -->
+        <!-- MANETTES VR -->
         <a-entity id="left-hand"
                   laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
                   raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5"
                   vr-click-handler>
         </a-entity>
 
-        <!-- ========== MANETTE DROITE ========== -->
         <a-entity id="right-hand"
                   laser-controls="hand: right; model: true; defaultModelColor: #FFD700"
                   raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5"
@@ -160,21 +201,18 @@
           <a-cylinder radius="0.04" height="0.55" position="0 0.275 0" color="#888" material="metalness: 0.9; roughness: 0.1"></a-cylinder>
         </a-entity>
 
-        <!-- MILKSHAKE (modèle 3D) -->
+        <!-- MILKSHAKE -->
         <a-entity id="trigger-milkshake" position="0 0.58 1.2">
           <a-entity id="milkshake-glb" gltf-model="#milkshake-model" position="0 0.2 0" scale="0.13 0.13 0.13"></a-entity>
           <a-light type="point" intensity="0.8" distance="2" color="#FFB6C1"></a-light>
-          <a-text value="$5 SHAKE" position="0 0.5 0" align="center" scale="0.35 0.35 0.35" color="#FFD700" 
-                  animation__float="property: position; from: 0 0.5 0; to: 0 0.55 0; dur: 1000; dir: alternate; loop: true"></a-text>
         </a-entity>
 
-        <!-- HITBOX CLIQUABLE -->
+        <!-- HITBOX TRÈS GRANDE pour détection fiable -->
         <a-box id="milkshake-hitbox" 
                class="clickable" 
-               position="0 0.8 1.2" 
-               width="0.5" height="0.6" depth="0.5"
-               visible="false">
-        </a-box>
+               position="0 0.9 1.15" 
+               width="1.0" height="1.2" depth="1.0"
+               material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
 
         <!-- NÉONS -->
         <a-entity position="0 3.5 -1.95">
@@ -190,7 +228,7 @@
           <a-light type="point" intensity="0.5" distance="2" color="#FFD700"></a-light>
         </a-entity>
 
-        <!-- PANNEAU D'AIDE VR -->
+        <!-- PANNEAU VR -->
         <a-entity id="vr-help" position="0 2.5 1.5" rotation="0 180 0" visible="false">
           <a-plane width="1.2" height="0.4" color="#000" opacity="0.8"></a-plane>
           <a-text value="Pointez le milkshake\net appuyez sur la gâchette" 
@@ -229,19 +267,57 @@
 
     <script>
       // ================================
-      // COMPOSANT: Gestion des clics VR (manettes)
+      // GESTION AUDIO
+      // ================================
+      const music = document.getElementById('twist-music');
+      const musicVolume = 0.7;
+      
+      // Fondu audio progressif
+      function fadeOutMusic(duration = 1500) {
+        const startVolume = music.volume;
+        const startTime = Date.now();
+        
+        function fade() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // Courbe exponentielle pour un fondu naturel
+          music.volume = startVolume * Math.pow(1 - progress, 2);
+          
+          if (progress < 1) {
+            requestAnimationFrame(fade);
+          } else {
+            music.pause();
+            music.volume = 0;
+            console.log('🎵 Musique arrêtée');
+          }
+        }
+        fade();
+      }
+      
+      // Écran de démarrage
+      document.getElementById('start-experience').addEventListener('click', () => {
+        document.getElementById('start-experience').style.display = 'none';
+        
+        music.volume = musicVolume;
+        music.play().then(() => {
+          console.log('🎵 Musique lancée');
+          updateDebug('🎵 ♪ You Never Can Tell ♪');
+        }).catch(err => {
+          console.warn('Audio bloqué:', err);
+        });
+      });
+
+      // ================================
+      // COMPOSANTS A-FRAME
       // ================================
       AFRAME.registerComponent('vr-click-handler', {
         init: function () {
           const el = this.el;
           
-          // Gâchette (trigger)
           el.addEventListener('triggerdown', this.onClick.bind(this));
-          
-          // WebXR standard events
           el.addEventListener('selectstart', this.onClick.bind(this));
           
-          // Changement de couleur au survol
           el.addEventListener('raycaster-intersection', (evt) => {
             const target = evt.detail.els[0];
             if (target && target.classList.contains('clickable')) {
@@ -263,15 +339,11 @@
             const target = intersections[0].object.el;
             if (target && target.classList.contains('clickable')) {
               target.emit('click');
-              console.log('🎮 VR Click on:', target.id);
             }
           }
         }
       });
 
-      // ================================
-      // COMPOSANT: Contraindre la position
-      // ================================
       AFRAME.registerComponent('constrain-position', {
         schema: {
           min: { type: 'vec3', default: { x: -1.7, y: 0, z: -1.7 } },
@@ -290,7 +362,7 @@
       });
 
       // ================================
-      // DEBUG & LOGIQUE PRINCIPALE
+      // LOGIQUE PRINCIPALE
       // ================================
       function updateDebug(msg) {
         const d = document.getElementById('debug');
@@ -310,6 +382,7 @@
           updateDebug('🥽 VR: Gâchette');
           
           const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
+          const desktopCursor = document.querySelector('#desktop-cursor');
           const blackOut = document.querySelector('#black-out');
           const sceneA = document.querySelector('#scene-a');
           const sceneB = document.querySelector('#scene-b');
@@ -322,17 +395,15 @@
 
           let transitionDone = false;
 
-          // Clic sur la hitbox (fonctionne pour Desktop ET VR)
-          milkshakeHitbox.addEventListener('click', () => {
-            if (transitionDone) return;
-            updateDebug('🥤 $5 Shake cliqué !');
-            transitionToSceneB();
-          });
-
+          // Fonction de transition
           function transitionToSceneB() {
             if (transitionDone) return;
             transitionDone = true;
             updateDebug('🎞️ CUT !');
+            
+            // ====== FONDU AUDIO ======
+            updateDebug('🎵 Fondu musical...');
+            fadeOutMusic(1500);
             
             if (instructions) instructions.innerHTML = 'THE MYSTERY';
             if (controls) controls.style.display = 'none';
@@ -366,19 +437,61 @@
             }, 250);
           }
 
-          // Gestion du mode VR
+          // ====== MÉTHODE 1: Clic direct sur la hitbox ======
+          milkshakeHitbox.addEventListener('click', () => {
+            updateDebug('🥤 Click direct hitbox');
+            transitionToSceneB();
+          });
+
+          // ====== MÉTHODE 2: Via le curseur desktop ======
+          if (desktopCursor) {
+            desktopCursor.addEventListener('click', (evt) => {
+              if (transitionDone) return;
+              const intersectedEl = evt.detail?.intersectedEl;
+              updateDebug('🖱️ Cursor click: ' + (intersectedEl ? intersectedEl.id : 'none'));
+              if (intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
+                transitionToSceneB();
+              }
+            });
+          }
+
+          // ====== MÉTHODE 3: Clic souris global (backup) ======
+          document.addEventListener('click', (evt) => {
+            if (transitionDone) return;
+            // Ignorer si c'est l'écran de démarrage
+            if (document.getElementById('start-experience').style.display !== 'none') return;
+            
+            // Vérifier via raycaster de la caméra
+            const cam = document.querySelector('#cam');
+            if (cam && cam.components.raycaster) {
+              const intersections = cam.components.raycaster.intersections;
+              if (intersections && intersections.length > 0) {
+                const hit = intersections[0].object.el;
+                if (hit && hit.id === 'milkshake-hitbox') {
+                  updateDebug('🖱️ Mouse raycaster hit');
+                  transitionToSceneB();
+                }
+              }
+            }
+          });
+
+          // Mode VR
           scene.addEventListener('enter-vr', () => {
             updateDebug('🥽 Mode VR activé');
             if (vrHelp) vrHelp.setAttribute('visible', 'true');
-            const desktopCursor = document.querySelector('#desktop-cursor');
-            if (desktopCursor) desktopCursor.setAttribute('visible', 'false');
+            document.querySelector('#desktop-cursor')?.setAttribute('visible', 'false');
+            
+            // Démarrer musique en VR
+            if (music.paused) {
+              music.volume = musicVolume;
+              music.play().catch(e => console.warn('Audio VR:', e));
+            }
           });
           
           scene.addEventListener('exit-vr', () => {
             updateDebug('🖥️ Mode Desktop');
             if (vrHelp) vrHelp.setAttribute('visible', 'false');
-            const desktopCursor = document.querySelector('#desktop-cursor');
-            if (desktopCursor) desktopCursor.setAttribute('visible', 'true');
+            document.querySelector('#desktop-cursor')?.setAttribute('visible', 'true');
           });
 
           updateDebug('─────────────────');
