@@ -1,253 +1,349 @@
-index.html :
-
-<!doctype html>
-
-<html lang="fr">
-
-
-
-<head>
-
-  <meta charset="UTF-8" />
-
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>chanelxpulpfiction</title>
-
-</head>
-
-
-
-<body>
-
-  <div id="app">
-
-    <!-- <a-scene>
-
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-
-      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-
-      <a-sky color="#ECECEC"></a-sky>
-
-    </a-scene> -->
-
-
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Pulp Fiction Experience</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #debug {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.8);
+        color: #0f0;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 1000;
+        max-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="debug">Chargement...</div>
 
     <a-scene>
-
+      
       <a-assets>
-
-        <img id="quilted-red"
-
-          src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/textures/grid.png">
-
-        <img id="dancer-shadow" src="https://cdn.pixabay.com/photo/2014/04/03/10/32/dancer-310890_1280.png">
-
+        <img id="dancer" src="https://cdn.pixabay.com/photo/2014/04/03/10/32/dancer-310890_1280.png" crossorigin="anonymous">
       </a-assets>
 
-
-
-      <a-entity id="rig" position="0 0 1">
-
-        <a-camera wasd-controls="acceleration: 20; fly: false; adEnabled: true; wsEnabled: true;"
-
-          look-controls></a-camera>
-
+      <!-- Caméra avec mouvement libre à la souris -->
+      <a-entity id="rig" position="0 0 0" 
+                wasd-controls="acceleration: 30">
+        <a-camera id="cam" position="0 1.6 0">
+          <a-cursor 
+            id="cursor"
+            color="#FF0000"
+            raycaster="objects: .clickable; far: 10"
+            fuse="false">
+          </a-cursor>
+          
+          <!-- Rideau noir attaché à la caméra -->
+          <a-plane id="black-out" position="0 0 -0.5" width="4" height="4" 
+                   material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" 
+                   visible="false">
+          </a-plane>
+        </a-camera>
       </a-entity>
 
-
-
-      <a-box id="room" position="0 2 0" width="4" height="4" depth="4" side="back"
-
-        material="color: #8B0000; metalness: 0.3; roughness: 0.8;"
-
-        animation__color="property: material.color; to: #000000; startEvents: reveal; dur: 2000">
-
+      <a-box id="room" position="0 2 0" width="4" height="4" depth="4" 
+             material="color: #111; metalness: 0.2; roughness: 0.8; side: back">
       </a-box>
 
+      <!-- SCÈNE A : Jack Rabbit Slim's -->
+      <a-entity id="scene-a">
+        <a-image src="#dancer" position="-0.8 1.2 -1.5" width="1.2" height="1.8" transparent="true"
+                 animation="property: rotation; to: 0 20 5; dur: 1000; dir: alternate; loop: true"></a-image>
+        <a-image src="#dancer" position="0.8 1.2 -1.5" width="1.2" height="1.8" transparent="true" scale="-1 1 1"
+                 animation="property: rotation; to: 0 -20 -5; dur: 1100; dir: alternate; loop: true"></a-image>
 
-
-      <a-entity id="scene-1">
-
-
-
-        <a-entity id="mallette-global" position="0 -1 -1"
-
-          animation="property: position; to: 0 0.5 -1; dur: 3000; easing: easeOutCubic; delay: 1000"
-
-          animation__rotate="property: rotation; to: 0 360 0; dur: 15000; loop: true; easing: linear">
-
-
-
-          <a-box width="0.8" height="0.15" depth="0.5" color="#1a1a1a">
-
-
-
-            <a-entity id="charniere" position="0 0.075 -0.25"
-
-              animation="property: rotation; to: -110 0 0; dur: 1500; delay: 4000; easing: easeInOutQuad">
-
-              <a-box width="0.8" height="0.05" depth="0.5" position="0 0.025 0.25" color="#222"></a-box>
-
-            </a-entity>
-
-
-
-            <a-entity id="montre-ascenseur" position="0 0 0"
-
-              animation="property: position; to: 0 1 0; dur: 2500; delay: 5000; easing: easeOutQuad">
-
-
-
-              <a-entity id="montre-redresseur" rotation="-90 0 0"
-
-                animation="property: rotation; from: -90 0 0; to: 0 0 0; dur: 2000; delay: 5500; easing: easeInOutCubic">
-
-
-
-                <a-entity id="montre-spinner"
-
-                  animation="property: rotation; from: 0 0 0; to: 0 360 0; dur: 4000; loop: true; easing: linear; delay: 5000">
-
-
-
-                  <a-circle radius="0.2" color="#FFF" material="side: double; metalness: 0.8; roughness: 0.1">
-
-                    <a-ring radius-inner="0.19" radius-outer="0.21" color="#D4AF37"></a-ring>
-
-                  </a-circle>
-
-
-
-                </a-entity>
-
-              </a-entity>
-
-            </a-entity>
-
-
-
-          </a-box>
-
+        <!-- Milkshake AVEC GÉOMÉTRIE CLIQUABLE -->
+        <a-entity id="trigger-milkshake" class="clickable" position="0 0.8 -1.2">
+          <!-- Hitbox invisible plus grande -->
+          <a-box class="clickable" width="0.3" height="0.5" depth="0.3" 
+                 material="opacity: 0; transparent: true"></a-box>
+          
+          <a-cylinder radius="0.1" height="0.3" color="#FFB6C1"></a-cylinder>
+          <a-cone radius-bottom="0.1" radius-top="0.02" height="0.1" position="0 0.2 0" color="#FFF"></a-cone>
+          <a-light type="point" intensity="0.5" distance="2" color="#FFB6C1"></a-light>
+          
+          <a-text value="$5 SHAKE\nCLICK ME" position="0 0.6 0" align="center" 
+                  scale="0.4 0.4 0.4" color="#FFF" width="2"></a-text>
         </a-entity>
 
+        <a-light type="ambient" color="#555" intensity="0.8"></a-light>
+        <a-light type="spot" position="0 3.8 -1.5" rotation="-90 0 0" intensity="1.2" color="#FFF"></a-light>
       </a-entity>
 
-
-
-      <!-- Conteneur pour les phares lumineux -->
-
-      <a-entity id="phares-container">
-
-        <!-- Sphère lumineuse gauche -->
-
-        <a-entity id="phare-left">
-
-          <a-sphere id="phare-left-sphere" radius="0.5" color="#FFF"
-
-                    material="shader: flat; emissive: #FFF">
-
-          </a-sphere>
-
-          <a-light id="phare-left-light" type="point" intensity="0" color="#FDFFD2"></a-light>
-
+      <!-- SCÈNE B : La Mallette -->
+      <a-entity id="scene-b" visible="false">
+        <a-entity id="briefcase" position="0 0.1 -1.5">
+          <!-- Base de la mallette (partie fixe) -->
+          <a-box id="briefcase-bottom" width="0.8" height="0.1" depth="0.5" color="#4a4a4a"
+                 material="metalness: 0.6; roughness: 0.4"></a-box>
+          
+          <!-- Charnière (point de pivot au fond de la mallette) -->
+          <a-entity id="briefcase-hinge" position="0 0.05 -0.25">
+            <!-- Couvercle qui pivote autour de la charnière -->
+            <a-box id="briefcase-lid" 
+                   width="0.8" height="0.05" depth="0.5" 
+                   position="0 0 0.25" 
+                   rotation="0 0 0"
+                   color="#555"
+                   material="metalness: 0.6; roughness: 0.4">
+            </a-box>
+          </a-entity>
+          
+          <!-- Lumière dorée (invisible au début, apparaît à l'ouverture) -->
+          <a-light id="golden-light" type="point" intensity="0" color="#FFD700" position="0 0.2 0" distance="8"></a-light>
+          
+          <!-- Intérieur lumineux (invisible au début) -->
+          <a-box id="golden-interior" width="0.6" height="0.01" depth="0.3" position="0 0.06 0" 
+                 material="color: #FFD700; shader: flat; emissive: #FFD700; emissiveIntensity: 0; opacity: 0; transparent: true"></a-box>
         </a-entity>
 
-
-
-        <!-- Sphère lumineuse droite -->
-
-        <a-entity id="phare-right">
-
-          <a-sphere id="phare-right-sphere" radius="0.5" color="#FFF"
-
-                    material="shader: flat; emissive: #FFF">
-
-          </a-sphere>
-
-          <a-light id="phare-right-light" type="point" intensity="0" color="#FDFFD2"></a-light>
-
-        </a-entity>
-
+        <!-- LUMIÈRES AMBIANTES POUR VOIR LA SCÈNE -->
+        <a-light type="ambient" color="#888" intensity="1.5"></a-light>
+        <a-light type="directional" position="2 4 2" intensity="1.2" color="#aaa"></a-light>
+        <a-light type="point" position="0 2 0" intensity="1.5" color="#999" distance="8"></a-light>
+        <a-light type="point" position="-2 2 -2" intensity="0.8" color="#777" distance="6"></a-light>
+        
+        <a-text id="mystery-text" value="" position="0 1.8 -2" align="center" color="#FFD700" scale="0.8 0.8 0.8"></a-text>
       </a-entity>
-
-
-
-      <!-- Flash blanc de transition -->
-
-      <a-plane id="flash" position="0 0 1.9" width="20" height="20"
-
-               material="color: #FFF; opacity: 0; transparent: true; shader: flat">
-
-      </a-plane>
-
-
-
-      <a-entity id="scene-2" position="0 0 -1.5" visible="false">
-
-
-
-        <a-plane rotation="-90 0 0" width="4" height="2" position="0 0.01 0.5" color="#111"
-
-          animation="property: material.color; to: #333; loop: true; dir: alternate; dur: 500">
-
-        </a-plane>
-
-
-
-        <a-image src="#dancer-shadow" position="-0.8 1.2 0" width="1.5" height="2.2" transparent="true"
-
-          animation="property: rotation; to: 0 20 5; dur: 1000; dir: alternate; loop: true; easing: easeInOutSine">
-
-        </a-image>
-
-        <a-image src="#dancer-shadow" position="0.8 1.2 0" width="1.5" height="2.2" transparent="true" scale="-1 1 1"
-
-          animation="property: rotation; to: 0 -20 -5; dur: 1100; dir: alternate; loop: true; easing: easeInOutSine">
-
-        </a-image>
-
-      </a-entity>
-
-
-
-      <a-light type="ambient" color="#444"></a-light>
-
-      <a-light type="directional" position="-1 2 1" intensity="0.5"></a-light>
-
-
 
     </a-scene>
 
-
-
     <script>
+      // Composant mouse-look SIMPLE qui fonctionne
+      AFRAME.registerComponent('mouse-look', {
+        schema: { sensitivity: { default: 1.5 } },
+        
+        init: function() {
+          this.yaw = 0;
+          this.pitch = 0;
+          this.onMouseMove = this.onMouseMove.bind(this);
+          
+          document.addEventListener('mousemove', this.onMouseMove);
+          console.log('✅ Mouse-look activé');
+        },
 
-      // Petit script pour changer la couleur du cube au moment de l'éblouissement
+        onMouseMove: function(e) {
+          if (!e.movementX && !e.movementY) return;
+          
+          this.yaw -= e.movementX * this.data.sensitivity * 0.002;
+          this.pitch -= e.movementY * this.data.sensitivity * 0.002;
+          this.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitch));
+        },
 
-      setTimeout(() => {
+        tick: function() {
+          if (!this.el || !this.el.object3D) return;
+          
+          const rotation = this.el.object3D.rotation;
+          rotation.order = 'YXZ';
+          rotation.y = this.yaw;
+          rotation.x = this.pitch;
+        },
 
-        document.querySelector('#room').emit('reveal');
+        remove: function() {
+          document.removeEventListener('mousemove', this.onMouseMove);
+        }
+      });
 
-        document.querySelector('#scene-1').setAttribute('visible', 'false');
+      function updateDebug(msg) {
+        const d = document.getElementById('debug');
+        if (d) d.innerHTML += '<br>' + msg;
+        console.log(msg);
+      }
 
-      }, 11000);
+      document.addEventListener('DOMContentLoaded', () => {
+        updateDebug('DOM chargé');
+        
+        const scene = document.querySelector('a-scene');
+        
+        scene.addEventListener('loaded', () => {
+          updateDebug('✅ Scène loaded');
+          
+          // Activer le mouse-look
+          const camera = document.querySelector('#cam');
+          camera.setAttribute('mouse-look', 'sensitivity: 1.5');
+          
+          const milkshake = document.querySelector('#trigger-milkshake');
+          const blackOut = document.querySelector('#black-out');
+          const sceneA = document.querySelector('#scene-a');
+          const sceneB = document.querySelector('#scene-b');
+          const room = document.querySelector('#room');
+          const cursor = document.querySelector('#cursor');
 
+          if (!milkshake) {
+            updateDebug('❌ Milkshake introuvable');
+            return;
+          }
+
+          updateDebug('✅ Milkshake trouvé');
+
+          let transitionDone = false; // FLAG pour empêcher la double transition
+
+          // MÉTHODE 1: Via le curseur A-Frame
+          cursor.addEventListener('click', (evt) => {
+            if (transitionDone) {
+              updateDebug('⚠️ Transition déjà effectuée');
+              return;
+            }
+            
+            updateDebug('🖱️ Curseur cliqué');
+            const intersected = evt.detail.intersection;
+            if (intersected) {
+              let el = intersected.object.el;
+              while (el && !el.classList.contains('clickable')) {
+                el = el.parentNode?.el;
+              }
+              if (el && el.id === 'trigger-milkshake') {
+                updateDebug('🎬 MILKSHAKE CLIQUÉ !');
+                transitionToSceneB();
+              }
+            }
+          });
+
+          // MÉTHODE 2: Directement sur l'entité
+          milkshake.addEventListener('click', () => {
+            if (transitionDone) {
+              updateDebug('⚠️ Transition déjà effectuée');
+              return;
+            }
+            updateDebug('🎬 MILKSHAKE EVENT !');
+            transitionToSceneB();
+          });
+
+          function transitionToSceneB() {
+            if (transitionDone) return; // Double sécurité
+            transitionDone = true;
+            
+            updateDebug('🎞️ Transition START');
+
+            // DÉSACTIVER le milkshake immédiatement
+            milkshake.classList.remove('clickable');
+            milkshake.setAttribute('visible', 'false');
+
+            blackOut.setAttribute('visible', 'true');
+            blackOut.setAttribute('animation', {
+              property: 'material.opacity',
+              from: 0,
+              to: 1,
+              dur: 400,
+              easing: 'easeInQuad'
+            });
+
+            setTimeout(() => {
+              updateDebug('🔄 Swap scènes');
+              
+              sceneA.setAttribute('visible', 'false');
+              sceneB.setAttribute('visible', 'true');
+              
+              room.setAttribute('material', {
+                color: '#1a1a1a',
+                metalness: 0.5,
+                roughness: 0.5,
+                side: 'back'
+              });
+
+              setTimeout(() => {
+                blackOut.setAttribute('animation', {
+                  property: 'material.opacity',
+                  from: 1,
+                  to: 0,
+                  dur: 1000,
+                  easing: 'easeOutQuad'
+                });
+
+                setTimeout(() => {
+                  blackOut.setAttribute('visible', 'false');
+                  updateDebug('✅ Transition DONE');
+                  
+                  // DÉCLENCHER L'ANIMATION D'OUVERTURE
+                  setTimeout(() => {
+                    openBriefcase();
+                  }, 500);
+                }, 1000);
+              }, 100);
+
+            }, 400);
+          }
+
+          function openBriefcase() {
+            updateDebug('💼 Ouverture de la mallette...');
+            
+            const hinge = document.querySelector('#briefcase-hinge');
+            const goldenLight = document.querySelector('#golden-light');
+            const goldenInterior = document.querySelector('#golden-interior');
+            const mysteryText = document.querySelector('#mystery-text');
+            
+            // 1. Animation de la charnière (rotation de 0° à -120°)
+            hinge.setAttribute('animation__open', {
+              property: 'rotation',
+              from: '0 0 0',
+              to: '-120 0 0',
+              dur: 2000,
+              easing: 'easeInOutCubic'
+            });
+            
+            // 2. Apparition progressive de la lumière dorée
+            setTimeout(() => {
+              goldenLight.setAttribute('animation__intensity', {
+                property: 'intensity',
+                from: 0,
+                to: 10,
+                dur: 1500,
+                easing: 'easeOutQuad'
+              });
+              
+              goldenLight.setAttribute('animation__pulse', {
+                property: 'intensity',
+                from: 8,
+                to: 12,
+                dur: 1000,
+                dir: 'alternate',
+                loop: true,
+                delay: 1500
+              });
+              
+              // 3. Intérieur lumineux devient visible
+              goldenInterior.setAttribute('animation__opacity', {
+                property: 'material.opacity',
+                from: 0,
+                to: 1,
+                dur: 1000,
+                easing: 'easeInQuad'
+              });
+              
+              goldenInterior.setAttribute('animation__emissive', {
+                property: 'material.emissiveIntensity',
+                from: 0,
+                to: 8,
+                dur: 1000,
+                easing: 'easeInQuad'
+              });
+              
+              updateDebug('💡 Lumière dorée activée');
+              
+            }, 800);
+            
+            // 4. Texte apparaît après l'ouverture complète
+            setTimeout(() => {
+              mysteryText.setAttribute('value', "What's in the box?");
+              mysteryText.setAttribute('animation__fade', {
+                property: 'material.opacity',
+                from: 0,
+                to: 1,
+                dur: 1500
+              });
+              updateDebug('✅ Mallette ouverte !');
+              updateDebug('✅ Caméra devrait être libre');
+            }, 2500);
+          }
+        });
+      });
     </script>
-
-  </div>
-
-  <script type="module" src="/src/main.js"></script>
-
-</body>
-
-
-
+  </body>
 </html>
