@@ -64,32 +64,55 @@
   </head>
   <body>
     <div id="debug">Initialisation...</div>
-    <div id="controls">ZQSD / ←↑↓→ : se déplacer • Souris : regarder</div>
+    <div id="controls">ZQSD / ←↑↓→ : se déplacer • Souris : regarder • VR : Gâchette pour interagir</div>
     <div id="instructions">Cliquez sur le $5 Shake</div>
     <div id="title">CHANEL × Pulp Fiction</div>
 
-    <a-scene>
+    <a-scene vr-mode-ui="enabled: true">
       
       <a-assets>
-        <!-- <img id="dancer1" src="./assets/images/MIA.png" crossorigin="anonymous"> -->
-        <a-asset-item id="couch-model" src="/PulpFictionFeatChanel/assets/models/Couch.glb"></a-asset-item>
-        <a-asset-item id="milkshake-model" src="/PulpFictionFeatChanel/assets/models/Milkshake.glb"></a-asset-item>
-        <a-asset-item id="speaker-model" src="/PulpFictionFeatChanel/assets/models/Speaker.glb"></a-asset-item>
+        <a-asset-item id="couch-model" src="./assets/models/Couch.glb"></a-asset-item>
+        <a-asset-item id="milkshake-model" src="./assets/models/Milkshake.glb"></a-asset-item>
+        <a-asset-item id="speaker-model" src="./assets/models/Speaker.glb"></a-asset-item>
       </a-assets>
 
-
-      <!-- CAMÉRA -->
+      <!-- ========== CAMERA RIG (Desktop + VR) ========== -->
       <a-entity id="rig" position="0 0 0"
                 wasd-controls="acceleration: 20"
                 constrain-position="min: -1.7 0 -1.7; max: 1.7 0 1.7">
+        
+        <!-- Caméra -->
         <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
-          <a-cursor id="cursor" color="#FFD700" opacity="0.8" raycaster="objects: .clickable; far: 10" fuse="false"
+          
+          <!-- Curseur pour Desktop (caché en VR) -->
+          <a-entity id="desktop-cursor"
+                    cursor="fuse: false; rayOrigin: mouse"
+                    raycaster="objects: .clickable; far: 10">
+            <a-ring position="0 0 -1" radius-inner="0.02" radius-outer="0.03" color="#FFD700" opacity="0.8"
                     animation__scale="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true">
-          </a-cursor>
+            </a-ring>
+          </a-entity>
+          
+          <!-- Black-out pour transition -->
           <a-plane id="black-out" position="0 0 -0.3" width="6" height="6" 
                    material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" visible="false">
           </a-plane>
         </a-camera>
+
+        <!-- ========== MANETTE GAUCHE ========== -->
+        <a-entity id="left-hand"
+                  laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
+                  raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5"
+                  vr-click-handler>
+        </a-entity>
+
+        <!-- ========== MANETTE DROITE ========== -->
+        <a-entity id="right-hand"
+                  laser-controls="hand: right; model: true; defaultModelColor: #FFD700"
+                  raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5"
+                  vr-click-handler>
+        </a-entity>
+
       </a-entity>
 
       <!-- Cube 4x4x4 -->
@@ -123,18 +146,6 @@
           <a-box position="0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
         </a-entity>
 
-        <!-- DANSEURS -->
-        <a-entity id="dancers" position="0 0 -0.8">
-          <!-- <a-entity position="-0.5 0 0">
-            <a-image src="#dancer1" position="0 0.9 0" width="1" height="1" transparent="true" opacity="0.9"
-                     animation__twist="property: rotation; from: 0 -15 -4; to: 0 15 4; dur: 700; dir: alternate; loop: true; easing: easeInOutSine"></a-image>
-          </a-entity> -->
-          <a-entity position="0.5 -0.3 0">
-            <a-image src="#dancer1" position="0 0.9 0" width="1" height="1" transparent="true" opacity="0.9" scale="-1 1 1"
-                     animation__twist="property: rotation; from: 0 15 4; to: 0 -15 -4; dur: 750; dir: alternate; loop: true; easing: easeInOutSine"></a-image>
-          </a-entity>
-        </a-entity>
-
         <!-- COUCHS -->
         <a-entity gltf-model="#couch-model" position="-1.6 0.2 0" rotation="0 -90 0" scale="1 1 1"></a-entity>
         <a-entity gltf-model="#couch-model" position="1.6 0.2 0" rotation="0 90 0" scale="1 1 1"></a-entity>
@@ -157,7 +168,7 @@
                   animation__float="property: position; from: 0 0.5 0; to: 0 0.55 0; dur: 1000; dir: alternate; loop: true"></a-text>
         </a-entity>
 
-        <!-- HITBOX INVISIBLE SÉPARÉE (avec visible="false" au lieu de opacity: 0) -->
+        <!-- HITBOX CLIQUABLE -->
         <a-box id="milkshake-hitbox" 
                class="clickable" 
                position="0 0.8 1.2" 
@@ -177,6 +188,13 @@
         <a-entity position="1.95 2.5 0" rotation="0 -90 0">
           <a-text value="★ 1950s ★" align="center" color="#FFD700" scale="0.25 0.25 0.25"></a-text>
           <a-light type="point" intensity="0.5" distance="2" color="#FFD700"></a-light>
+        </a-entity>
+
+        <!-- PANNEAU D'AIDE VR -->
+        <a-entity id="vr-help" position="0 2.5 1.5" rotation="0 180 0" visible="false">
+          <a-plane width="1.2" height="0.4" color="#000" opacity="0.8"></a-plane>
+          <a-text value="Pointez le milkshake\net appuyez sur la gâchette" 
+                  position="0 0 0.01" align="center" color="#FFD700" scale="0.4 0.4 0.4" width="2.5"></a-text>
         </a-entity>
 
         <!-- ÉCLAIRAGE -->
@@ -210,6 +228,50 @@
     </a-scene>
 
     <script>
+      // ================================
+      // COMPOSANT: Gestion des clics VR (manettes)
+      // ================================
+      AFRAME.registerComponent('vr-click-handler', {
+        init: function () {
+          const el = this.el;
+          
+          // Gâchette (trigger)
+          el.addEventListener('triggerdown', this.onClick.bind(this));
+          
+          // WebXR standard events
+          el.addEventListener('selectstart', this.onClick.bind(this));
+          
+          // Changement de couleur au survol
+          el.addEventListener('raycaster-intersection', (evt) => {
+            const target = evt.detail.els[0];
+            if (target && target.classList.contains('clickable')) {
+              el.setAttribute('raycaster', 'lineColor', '#00FF00');
+            }
+          });
+          
+          el.addEventListener('raycaster-intersection-cleared', () => {
+            el.setAttribute('raycaster', 'lineColor', '#FFD700');
+          });
+        },
+        
+        onClick: function () {
+          const raycaster = this.el.components.raycaster;
+          if (!raycaster) return;
+          
+          const intersections = raycaster.intersections;
+          if (intersections.length > 0) {
+            const target = intersections[0].object.el;
+            if (target && target.classList.contains('clickable')) {
+              target.emit('click');
+              console.log('🎮 VR Click on:', target.id);
+            }
+          }
+        }
+      });
+
+      // ================================
+      // COMPOSANT: Contraindre la position
+      // ================================
       AFRAME.registerComponent('constrain-position', {
         schema: {
           min: { type: 'vec3', default: { x: -1.7, y: 0, z: -1.7 } },
@@ -227,6 +289,9 @@
         }
       });
 
+      // ================================
+      // DEBUG & LOGIQUE PRINCIPALE
+      // ================================
       function updateDebug(msg) {
         const d = document.getElementById('debug');
         if (d) { d.innerHTML += `<br>${msg}`; d.scrollTop = d.scrollHeight; }
@@ -241,7 +306,8 @@
         
         scene.addEventListener('loaded', () => {
           updateDebug('✅ Scène chargée');
-          updateDebug('🎮 ZQSD pour bouger');
+          updateDebug('🎮 Desktop: ZQSD + clic');
+          updateDebug('🥽 VR: Gâchette');
           
           const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
           const blackOut = document.querySelector('#black-out');
@@ -249,26 +315,17 @@
           const sceneB = document.querySelector('#scene-b');
           const room = document.querySelector('#room');
           const floor = document.querySelector('#floor');
-          const cursor = document.querySelector('#cursor');
           const instructions = document.getElementById('instructions');
           const controls = document.getElementById('controls');
           const mysteryText = document.querySelector('#mystery-text');
+          const vrHelp = document.querySelector('#vr-help');
 
           let transitionDone = false;
 
-          // Clic sur la hitbox invisible
-          cursor.addEventListener('click', (evt) => {
-            if (transitionDone) return;
-            const intersectedEl = evt.detail.intersectedEl;
-            if (intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
-              updateDebug('🥤 $5 Shake cliqué !');
-              transitionToSceneB();
-            }
-          });
-
+          // Clic sur la hitbox (fonctionne pour Desktop ET VR)
           milkshakeHitbox.addEventListener('click', () => {
             if (transitionDone) return;
-            updateDebug('🥤 Shake (direct)');
+            updateDebug('🥤 $5 Shake cliqué !');
             transitionToSceneB();
           });
 
@@ -276,12 +333,15 @@
             if (transitionDone) return;
             transitionDone = true;
             updateDebug('🎞️ CUT !');
+            
             if (instructions) instructions.innerHTML = 'THE MYSTERY';
             if (controls) controls.style.display = 'none';
             milkshakeHitbox.classList.remove('clickable');
 
             blackOut.setAttribute('visible', 'true');
-            blackOut.setAttribute('animation__fadeIn', { property: 'material.opacity', from: 0, to: 1, dur: 200, easing: 'easeInQuad' });
+            blackOut.setAttribute('animation__fadeIn', { 
+              property: 'material.opacity', from: 0, to: 1, dur: 200, easing: 'easeInQuad' 
+            });
 
             setTimeout(() => {
               sceneA.setAttribute('visible', 'false');
@@ -291,7 +351,9 @@
               document.querySelector('#rig').object3D.position.set(0, 0, 1);
 
               setTimeout(() => {
-                blackOut.setAttribute('animation__fadeOut', { property: 'material.opacity', from: 1, to: 0, dur: 1500, easing: 'easeOutCubic' });
+                blackOut.setAttribute('animation__fadeOut', { 
+                  property: 'material.opacity', from: 1, to: 0, dur: 1500, easing: 'easeOutCubic' 
+                });
                 setTimeout(() => {
                   mysteryText.setAttribute('animation__appear', { property: 'opacity', from: 0, to: 0.9, dur: 2000 });
                 }, 800);
@@ -304,7 +366,23 @@
             }, 250);
           }
 
-          updateDebug('👆 Cliquez sur le shake');
+          // Gestion du mode VR
+          scene.addEventListener('enter-vr', () => {
+            updateDebug('🥽 Mode VR activé');
+            if (vrHelp) vrHelp.setAttribute('visible', 'true');
+            const desktopCursor = document.querySelector('#desktop-cursor');
+            if (desktopCursor) desktopCursor.setAttribute('visible', 'false');
+          });
+          
+          scene.addEventListener('exit-vr', () => {
+            updateDebug('🖥️ Mode Desktop');
+            if (vrHelp) vrHelp.setAttribute('visible', 'false');
+            const desktopCursor = document.querySelector('#desktop-cursor');
+            if (desktopCursor) desktopCursor.setAttribute('visible', 'true');
+          });
+
+          updateDebug('─────────────────');
+          updateDebug('👆 Pointez le shake');
         });
       });
     </script>
