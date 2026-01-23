@@ -206,10 +206,10 @@
 
       <!-- KITCHEN BAR -->
       <a-entity id="bar" position="-0.3 0 0.4" scale="1.5 1.5 1.5">
-        <a-entity gltf-model="#kitchen-bar-model" position="0 0 -1.3" rotation="0 0 0" scale="1.2 1.800 1.2"></a-entity>
-        <a-entity gltf-model="#kitchen-bar-model" position="0.5 0 -1.3" rotation="0 0 0" scale="1.2 1.800 1.2"></a-entity>
-        <a-entity gltf-model="#kitchen-bar-model" position="1 0 -1.3" rotation="0 0 0" scale="1.2 1.800 1.2"></a-entity>
-        <a-entity gltf-model="#kitchen-bar-model" position="0.747 0 -1.802" rotation="0 90 0" scale="1.2 1.800 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="0 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="0.5 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="1 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="0.747 0 -1.802" rotation="0 90 0" scale="1.2 1.2 1.2"></a-entity>
         <a-entity gltf-model="#glass1" position="0.870 0.645 -1.300" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
         <a-entity gltf-model="#glass1" position="-0.415 0.645 -1.149" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
         <a-entity gltf-model="#glass2" position="0.071 0.505 -1.136" rotation="0 0 0" scale="0.1 0.1 0.1"></a-entity>
@@ -288,8 +288,8 @@
       <a-entity id="briefcase" position="0 0.65 -0.8">
         <a-entity gltf-model="#valise-model" 
                   position="0 0 0" 
-                  rotation="0 100 0" 
-                  scale="0.4 0.4 0.4">
+                  rotation="0 0 0" 
+                  scale="1 1 1">
         </a-entity>
         
         <!-- Lumière divine émanant de la mallette -->
@@ -317,13 +317,13 @@
       <a-light type="point" color="#4A0000" intensity="0.4" distance="4" position="0 3.9 0"></a-light>
 
       <!-- Texte mystère -->
-      <a-text id="mystery-text" value="text" position="0 2.8 -1.5" align="center" color="#FFD700"
+      <a-text id="mystery-text" value="What's in the box?" position="0 2.8 -1.5" align="center" color="#FFD700"
         scale="0.6 0.6 0.6" opacity="0"
         animation__float="property: position; from: 0 2.8 -1.5; to: 0 2.85 -1.5; dur: 2000; dir: alternate; loop: true">
       </a-text>
       
       <!-- Particules dorées -->
-      <a-entity position="0 0.6 -0.8">
+      <a-entity position="0 1.5 -0.8">
         <a-sphere radius="0.01" position="0.2 0.3 0.1" material="color: #FFD700; opacity: 0.3; transparent: true"
                   animation__float1="property: position; to: 0.25 0.5 0.15; dur: 4000; dir: alternate; loop: true"></a-sphere>
         <a-sphere radius="0.008" position="-0.15 0.2 -0.1" material="color: #FFD700; opacity: 0.2; transparent: true"
@@ -341,17 +341,28 @@
     const musicVolume = 0.3;
 
     function fadeOutMusic(duration = 1500) {
+      console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
+      
+      if (!music || music.paused) {
+        console.log('🎵 Musique déjà en pause ou non trouvée');
+        return;
+      }
+      
       const startVolume = music.volume;
       const startTime = Date.now();
+      
       function fade() {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
         music.volume = startVolume * Math.pow(1 - progress, 2);
+        
         if (progress < 1) {
           requestAnimationFrame(fade);
         } else {
           music.pause();
           music.volume = 0;
+          console.log('🎵 Musique arrêtée');
+          updateDebug('🎵 Musique arrêtée');
         }
       }
       fade();
@@ -361,8 +372,12 @@
       document.getElementById('start-experience').style.display = 'none';
       music.volume = musicVolume;
       music.play().then(() => {
+        console.log('🎵 Musique lancée avec succès');
         updateDebug('🎵 ♪ You Never Can Tell ♪');
-      }).catch(err => console.warn('Audio bloqué:', err));
+      }).catch(err => {
+        console.warn('Audio bloqué:', err);
+        updateDebug('⚠️ Audio bloqué');
+      });
     });
 
     AFRAME.registerComponent('vr-click-handler', {
@@ -445,7 +460,12 @@
           if (transitionDone) return;
           transitionDone = true;
           updateDebug('🎞️ CUT !');
+          
+          // Vérifier l'état de la musique
+          console.log('🎵 État musique avant fondu - paused:', music.paused, 'volume:', music.volume);
           updateDebug('🎵 Fondu musical...');
+          
+          // Appeler le fondu
           fadeOutMusic(1500);
 
           if (instructions) instructions.innerHTML = 'THE MYSTERY';
