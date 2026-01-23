@@ -144,6 +144,8 @@
       <a-asset-item id="bottle1" src="./assets/models/bottle1.glb"></a-asset-item>
       <a-asset-item id="glass1" src="./assets/models/glass1.glb"></a-asset-item>
       <a-asset-item id="glass2" src="./assets/models/glass2.glb"></a-asset-item>
+      <a-asset-item id="blood-model" src="./assets/models/Blood.glb"></a-asset-item>
+      <a-asset-item id="pistol-model" src="./assets/models/pistol.glb"></a-asset-item>
     </a-assets>
 
     <!-- ========== CAMERA RIG ========== -->
@@ -244,6 +246,16 @@
 
 
 
+      <!-- FLAQUE DE SANG AVEC PISTOLET -->
+      <a-entity position="0.5 0 -0.8">
+        <!-- Modèle de sang (Blood.glb) -->
+        <a-entity id="blood" gltf-model="#blood-model" position="0 0.038 1.778" rotation="0 0 0" scale="0.6 0.6 0.6"></a-entity>
+        <!-- Pistolet dans la flaque -->
+        <a-entity id="pistol" gltf-model="#pistol-model" position="0 0.150 1.536" rotation="90 45 0" scale="0.1 0.1 0.1"></a-entity>
+        <!-- Éclairage ambiant pour la flaque -->
+        <a-light type="point" intensity="0.4" distance="2" color="#FF6347" position="0 0.2 0"></a-light>
+      </a-entity>
+
       <!-- TABLE -->
       <a-entity position="0 0 1.2">
         <a-cylinder radius="0.35" height="0.05" position="0 0.55 0" color="#222"
@@ -284,16 +296,16 @@
 
 
       <!-- NÉONS TEXTE ORIGINAUX -->
-      <a-entity position="0 3.5 -1.95">
+      <a-entity position="0 2.5 -1.95">
         <a-text value="JACK RABBIT SLIM'S" align="center" color="#FF1493" scale="0.35 0.35 0.35"></a-text>
         <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="0 0 0.1"></a-light>
       </a-entity>
 
 
       <!-- PANNEAU VR -->
-      <a-entity id="vr-help" position="0 2.5 1.5" rotation="0 180 0" visible="false">
+      <a-entity id="vr-help" position="0 2 1.5" rotation="0 180 0" visible="false">
         <a-plane width="1.2" height="0.4" color="#000" opacity="0.8"></a-plane>
-        <a-text value="Pointez le milkshake\net appuyez sur la gâchette" position="0 0 0.01" align="center"
+        <a-text value="Pointez le milkshake\net appuyez sur la gachette" position="0 0 0.01" align="center"
           color="#FFD700" scale="0.4 0.4 0.4" width="2.5"></a-text>
       </a-entity>
 
@@ -339,7 +351,7 @@
     // GESTION AUDIO
     // ================================
     const music = document.getElementById('twist-music');
-    const musicVolume = 0.7;
+    const musicVolume = 0.3;
 
     // Fondu audio progressif
     function fadeOutMusic(duration = 1500) {
