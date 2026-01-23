@@ -1,531 +1,573 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Chanel x Pulp Fiction Experience</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <style>
-      body { margin: 0; overflow: hidden; }
-      #debug {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        background: rgba(0,0,0,0.85);
-        color: #0f0;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 11px;
-        z-index: 1000;
-        max-width: 280px;
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid #0f0;
-      }
-      #instructions {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.8);
-        color: #fff;
-        padding: 15px 30px;
-        font-family: 'Helvetica Neue', sans-serif;
-        font-size: 14px;
-        border-radius: 0;
-        border: 1px solid #FFD700;
-        z-index: 1000;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-      }
-      #title {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        color: #FFD700;
-        font-family: 'Georgia', serif;
-        font-size: 18px;
-        font-style: italic;
-        z-index: 1000;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-      }
-      #controls {
-        position: fixed;
-        bottom: 70px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.6);
-        color: #aaa;
-        padding: 8px 15px;
-        font-family: monospace;
-        font-size: 11px;
-        z-index: 1000;
-      }
-      /* Écran de démarrage (requis pour l'audio) */
-      #start-experience {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        cursor: pointer;
-      }
-      #start-experience h1 {
-        color: #FFD700;
-        font-family: 'Georgia', serif;
-        font-size: 48px;
-        font-style: italic;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 8px rgba(255,215,0,0.5);
-      }
-      #start-experience p {
-        color: #fff;
-        font-family: 'Helvetica Neue', sans-serif;
-        font-size: 18px;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        animation: pulse 2s infinite;
-      }
-      @keyframes pulse {
-        0%, 100% { opacity: 0.5; }
-        50% { opacity: 1; }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Écran de démarrage -->
-    <div id="start-experience">
-      <h1>CHANEL × Pulp Fiction</h1>
-      <p>Cliquez pour entrer</p>
-    </div>
 
-    <div id="debug">Initialisation...</div>
-    <div id="controls">ZQSD / ←↑↓→ : se déplacer • Souris : regarder • VR : Gâchette pour interagir</div>
-    <div id="instructions">Cliquez sur le $5 Shake</div>
-    <div id="title">CHANEL × Pulp Fiction</div>
+<head>
+  <meta charset="utf-8">
+  <title>Chanel x Pulp Fiction Experience</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
 
-    <!-- Audio -->
-    <audio id="twist-music" loop preload="auto">
-      <source src="./assets/song/You Never Can Tell.mp3" type="audio/mpeg">
-    </audio>
+    #debug {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #0f0;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      z-index: 1000;
+      max-width: 280px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #0f0;
+    }
 
-    <a-scene vr-mode-ui="enabled: true">
-      
-      <a-assets>
-        <a-asset-item id="couch-model" src="./assets/models/Couch.glb"></a-asset-item>
-        <a-asset-item id="milkshake-model" src="./assets/models/Milkshake.glb"></a-asset-item>
-        <a-asset-item id="speaker-model" src="./assets/models/Speaker.glb"></a-asset-item>
-        <a-asset-item id="kitchen-bar-model" src="./assets/models/Kitchen_Bar.glb"></a-asset-item>
-        <a-asset-item id="bottle1" src="./assets/models/bottle1.glb"></a-asset-item>
-        <a-asset-item id="glass1" src="./assets/models/glass1.glb"></a-asset-item>
-        <a-asset-item id="glass2" src="./assets/models/glass2.glb"></a-asset-item>
-      </a-assets>
+    #instructions {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 15px 30px;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 14px;
+      border-radius: 0;
+      border: 1px solid #FFD700;
+      z-index: 1000;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
 
-      <!-- ========== CAMERA RIG ========== -->
-      <a-entity id="rig" position="0 0 0"
-                wasd-controls="acceleration: 20"
-                constrain-position="min: -1.7 0 -1.7; max: 1.7 0 1.7">
-        
-        <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
-          <a-entity id="desktop-cursor"
-                    cursor="fuse: false; rayOrigin: mouse"
-                    raycaster="objects: .clickable; far: 10">
-            <a-ring position="0 0 -1" radius-inner="0.02" radius-outer="0.03" color="#FFD700" opacity="0.8"
-                    animation__scale="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true">
-            </a-ring>
-          </a-entity>
-          
-          <a-plane id="black-out" position="0 0 -0.3" width="6" height="6" 
-                   material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" visible="false">
-          </a-plane>
-        </a-camera>
+    #title {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      color: #FFD700;
+      font-family: 'Georgia', serif;
+      font-size: 18px;
+      font-style: italic;
+      z-index: 1000;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
 
-        <!-- MANETTES VR -->
-        <a-entity id="left-hand"
-                  laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
-                  raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5"
-                  vr-click-handler>
+    #controls {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      color: #aaa;
+      padding: 8px 15px;
+      font-family: monospace;
+      font-size: 11px;
+      z-index: 1000;
+    }
+
+    /* Écran de démarrage (requis pour l'audio) */
+    #start-experience {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      cursor: pointer;
+    }
+
+    #start-experience h1 {
+      color: #FFD700;
+      font-family: 'Georgia', serif;
+      font-size: 48px;
+      font-style: italic;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(255, 215, 0, 0.5);
+    }
+
+    #start-experience p {
+      color: #fff;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Écran de démarrage -->
+  <div id="start-experience">
+    <h1>CHANEL × Pulp Fiction</h1>
+    <p>Cliquez pour entrer</p>
+  </div>
+
+  <div id="debug">Initialisation...</div>
+  <div id="controls">ZQSD / ←↑↓→ : se déplacer • Souris : regarder • VR : Gâchette pour interagir</div>
+  <div id="instructions">Cliquez sur le $5 Shake</div>
+  <div id="title">CHANEL × Pulp Fiction</div>
+
+  <!-- Audio -->
+  <audio id="twist-music" loop preload="auto">
+    <source src="./assets/song/You Never Can Tell.mp3" type="audio/mpeg">
+  </audio>
+
+  <a-scene vr-mode-ui="enabled: true">
+
+    <a-assets>
+      <a-asset-item id="couch-model" src="./assets/models/Couch.glb"></a-asset-item>
+      <a-asset-item id="milkshake-model" src="./assets/models/Milkshake.glb"></a-asset-item>
+      <a-asset-item id="speaker-model" src="./assets/models/Speaker.glb"></a-asset-item>
+      <a-asset-item id="kitchen-bar-model" src="./assets/models/Kitchen_Bar.glb"></a-asset-item>
+      <a-asset-item id="bottle1" src="./assets/models/bottle1.glb"></a-asset-item>
+      <a-asset-item id="glass1" src="./assets/models/glass1.glb"></a-asset-item>
+      <a-asset-item id="glass2" src="./assets/models/glass2.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- ========== CAMERA RIG ========== -->
+    <a-entity id="rig" position="0 0 0" wasd-controls="acceleration: 20"
+      constrain-position="min: -1.7 0 -1.7; max: 1.7 0 1.7">
+
+      <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
+        <a-entity id="desktop-cursor" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable; far: 10">
+          <a-ring position="0 0 -1" radius-inner="0.02" radius-outer="0.03" color="#FFD700" opacity="0.8"
+            animation__scale="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true">
+          </a-ring>
         </a-entity>
 
-        <a-entity id="right-hand"
-                  laser-controls="hand: right; model: true; defaultModelColor: #FFD700"
-                  raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5"
-                  vr-click-handler>
-        </a-entity>
+        <a-plane id="black-out" position="0 0 -0.3" width="6" height="6"
+          material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" visible="false">
+        </a-plane>
+      </a-camera>
 
+      <!-- MANETTES VR -->
+      <a-entity id="left-hand" laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
+        raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
       </a-entity>
 
-      <!-- Cube 4x4x4 -->
-      <a-box id="room" position="0 2 0" width="4" height="4" depth="4" 
-             material="color: #1a0a0a; metalness: 0.3; roughness: 0.7; side: back"></a-box>
+      <a-entity id="right-hand" laser-controls="hand: right; model: true; defaultModelColor: #FFD700"
+        raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
+      </a-entity>
 
-      <!-- Sol -->
-      <a-plane id="floor" position="0 0.01 0" rotation="-90 0 0" width="4" height="4"
-               material="color: #111; metalness: 0.5; roughness: 0.5"></a-plane>
+    </a-entity>
 
-      <!-- ========== SCÈNE A ========== -->
-      <a-entity id="scene-a">
-        
-        <!-- DANCEFLOOR -->
-        <a-entity id="dancefloor" position="0 0.02 0">
-          <a-box position="-0.75 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.75 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.75 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.75 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.75 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.75 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="-0.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE" material="metalness: 0.8; roughness: 0.2"></a-box>
-          <a-box position="0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111" material="metalness: 0.8; roughness: 0.2"></a-box>
-        </a-entity>
+    <!-- Cube 4x4x4 -->
+    <a-box id="room" position="0 2 0" width="4" height="4" depth="4"
+      material="color: #1a0a0a; metalness: 0.3; roughness: 0.7; side: back"></a-box>
 
-        <!-- COUCHS -->
-        <a-entity gltf-model="#couch-model" position="-1.6 0.3 0" rotation="0 -90 0" scale="1.4 1.4 1.4"></a-entity>
-        <a-entity gltf-model="#couch-model" position="1.6 0.3 0" rotation="0 90 0" scale="1.4 1.4 1.4"></a-entity>
+    <!-- Sol -->
+    <a-plane id="floor" position="0 0.01 0" rotation="-90 0 0" width="4" height="4"
+      material="color: #111; metalness: 0.5; roughness: 0.5"></a-plane>
 
-        <!-- SPEAKERS -->
-        <a-entity gltf-model="#speaker-model" position="-1.5 0 -1.5" rotation="0 45 0" scale="0.5 0.5 0.5"></a-entity>
-        <a-entity gltf-model="#speaker-model" position="1.5 0 -1.5" rotation="0 -45 0" scale="1 1 1"></a-entity>
+    <!-- ========== SCÈNE A ========== -->
+    <a-entity id="scene-a">
 
-        <!-- KITCHEN BAR -->
+      <!-- DANCEFLOOR -->
+      <a-entity id="dancefloor" position="0 0.02 0">
+        <a-box position="-0.75 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.25 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.75 0 -0.75" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.75 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.25 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.75 0 -0.25" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.75 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.25 0 0.25" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.75 0 0.25" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="-0.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.25 0 0.75" width="0.5" height="0.02" depth="0.5" color="#EEE"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+        <a-box position="0.75 0 0.75" width="0.5" height="0.02" depth="0.5" color="#111"
+          material="metalness: 0.8; roughness: 0.2"></a-box>
+      </a-entity>
+
+      <!-- COUCHS -->
+      <a-entity gltf-model="#couch-model" position="-1.6 0.3 0" rotation="0 -90 0" scale="1.6 1.6 1.6"></a-entity>
+      <a-entity gltf-model="#couch-model" position="1.6 0.3 0" rotation="0 90 0" scale="1.6 1.6 1.6"></a-entity>
+
+      <!-- SPEAKERS -->
+      <a-entity gltf-model="#speaker-model" position="-1.5 0 -1.5" rotation="0 45 0" scale="0.5 0.5 0.5"></a-entity>
+      <a-entity gltf-model="#speaker-model" position="1.5 0 -1.5" rotation="0 -45 0" scale="1 1 1"></a-entity>
+
+      <!-- KITCHEN BAR -->
+      <a-entity id="bar" position="-0.3 0 0.4" scale="1.5 1.5 1.5">
         <a-entity gltf-model="#kitchen-bar-model" position="0 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
         <a-entity gltf-model="#kitchen-bar-model" position="0.5 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
         <a-entity gltf-model="#kitchen-bar-model" position="1 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
-        <a-entity gltf-model="#kitchen-bar-model" position="0.747 0 -1.802" rotation="0 90 0" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="0.747 0 -1.802" rotation="0 90 0"
+          scale="1.2 1.2 1.2"></a-entity>
 
         <a-entity gltf-model="#glass1" position="0.870 0.645 -1.300" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
         <a-entity gltf-model="#glass1" position="-0.415 0.645 -1.149" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
 
-        <a-entity gltf-model="#glass2" position="0.071 0.645 -1.05" rotation="0 0 0" scale="0.1 0.1 0.1"></a-entity>
-
-
-        <!-- TABLE -->
-        <a-entity position="0 0 1.2">
-          <a-cylinder radius="0.35" height="0.05" position="0 0.55 0" color="#222" material="metalness: 0.9; roughness: 0.1"></a-cylinder>
-          <a-cylinder radius="0.04" height="0.55" position="0 0.275 0" color="#888" material="metalness: 0.9; roughness: 0.1"></a-cylinder>
-        </a-entity>
-
-        <!-- MILKSHAKE -->
-        <a-entity id="trigger-milkshake" position="0 0.58 1.2">
-          <a-entity id="milkshake-glb" gltf-model="#milkshake-model" position="0 0.2 0" scale="0.13 0.13 0.13"></a-entity>
-          <a-light type="point" intensity="0.8" distance="2" color="#FFB6C1"></a-light>
-        </a-entity>
-
-        <!-- HITBOX TRÈS GRANDE pour détection fiable -->
-        <a-box id="milkshake-hitbox" 
-               class="clickable" 
-               position="0 0.9 1.15" 
-               width="1.0" height="1.2" depth="1.0"
-               material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
-
-        <!-- NÉONS PLAFOND - BARRES LUMINEUSES HORIZONTALES -->
-        <!-- Barre néon rose 1 (avant) -->
-        <a-entity position="0 3.95 -1.8">
-          <a-box width="3.8" height="0.05" depth="0.05" material="color: #FF1493; emissive: #FF1493; emissiveIntensity: 3; shader: flat"></a-box>
-          <a-light type="point" intensity="1.2" distance="4" color="#FF1493" position="0 0 0"></a-light>
-          <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="-1.5 0 0"></a-light>
-          <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="1.5 0 0"></a-light>
-        </a-entity>
-
-        <!-- Barre néon bleu cyan 2 (arrière) -->
-        <a-entity position="0 3.95 1.8">
-          <a-box width="3.8" height="0.05" depth="0.05" material="color: #00CED1; emissive: #00CED1; emissiveIntensity: 3; shader: flat"></a-box>
-          <a-light type="point" intensity="1.2" distance="4" color="#00CED1" position="0 0 0"></a-light>
-          <a-light type="point" intensity="0.8" distance="3" color="#00CED1" position="-1.5 0 0"></a-light>
-          <a-light type="point" intensity="0.8" distance="3" color="#00CED1" position="1.5 0 0"></a-light>
-        </a-entity>
-
-        
-
-        <!-- NÉONS TEXTE ORIGINAUX -->
-        <a-entity position="0 3.5 -1.95">
-          <a-text value="JACK RABBIT SLIM'S" align="center" color="#FF1493" scale="0.35 0.35 0.35"></a-text>
-          <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="0 0 0.1"></a-light>
-        </a-entity>
-
-
-        <!-- PANNEAU VR -->
-        <a-entity id="vr-help" position="0 2.5 1.5" rotation="0 180 0" visible="false">
-          <a-plane width="1.2" height="0.4" color="#000" opacity="0.8"></a-plane>
-          <a-text value="Pointez le milkshake\net appuyez sur la gâchette" 
-                  position="0 0 0.01" align="center" color="#FFD700" scale="0.4 0.4 0.4" width="2.5"></a-text>
-        </a-entity>
-
-        <!-- ÉCLAIRAGE -->
-        <a-light type="ambient" color="#331111" intensity="0.4"></a-light>
-        <a-light type="spot" position="0 3.9 0" rotation="-90 0 0" intensity="1.5" color="#FFFAF0" angle="50" penumbra="0.3"></a-light>
-        <a-light type="point" position="-1.5 3 -1" intensity="0.6" color="#FF1493" distance="4"></a-light>
-        <a-light type="point" position="1.5 3 -1" intensity="0.6" color="#00CED1" distance="4"></a-light>
-        <a-light type="point" position="0 3 1.5" intensity="0.4" color="#FFD700" distance="3"></a-light>
+        <a-entity gltf-model="#glass2" position="0.071 0.505 -1.136" rotation="0 0 0" scale="0.1 0.1 0.1"></a-entity>
       </a-entity>
 
-      <!-- ========== SCÈNE B ========== -->
-      <a-entity id="scene-b" visible="false">
-        <a-entity id="briefcase" position="0 0.6 -1">
-          <a-box width="0.8" height="0.12" depth="0.5" color="#1a1a1a" material="metalness: 0.8; roughness: 0.2">
-            <a-box position="-0.28 0.07 0.26" width="0.06" height="0.015" depth="0.015" color="#D4AF37" material="metalness: 1; roughness: 0.1"></a-box>
-            <a-box position="0.28 0.07 0.26" width="0.06" height="0.015" depth="0.015" color="#D4AF37" material="metalness: 1; roughness: 0.1"></a-box>
-            <a-text value="CHANEL" position="0 0.065 0.251" align="center" color="#D4AF37" scale="0.06 0.06 0.06"></a-text>
-          </a-box>
-          <a-entity position="0 0.06 -0.25" rotation="-115 0 0">
-            <a-box width="0.8" height="0.05" depth="0.5" position="0 0 0.25" color="#1a1a1a" material="metalness: 0.8; roughness: 0.2"></a-box>
-          </a-entity>
-          <a-box width="0.7" height="0.01" depth="0.4" position="0 0.065 0" material="color: #FFD700; shader: flat; emissive: #FFD700; emissiveIntensity: 8"></a-box>
-          <a-light type="point" intensity="10" color="#FFD700" position="0 0.5 0" distance="12"
-                   animation__pulse="property: intensity; from: 8; to: 14; dur: 2000; dir: alternate; loop: true"></a-light>
-          <a-light type="point" intensity="3" color="#FFA500" position="0 0.2 0" distance="5"></a-light>
-        </a-entity>
-        <a-text id="mystery-text" value="What's in the box?" position="0 2.8 -1.5" align="center" color="#FFD700" scale="0.5 0.5 0.5" opacity="0"></a-text>
-        <a-light type="ambient" color="#111" intensity="0.1"></a-light>
+
+
+      <!-- TABLE -->
+      <a-entity position="0 0 1.2">
+        <a-cylinder radius="0.35" height="0.05" position="0 0.55 0" color="#222"
+          material="metalness: 0.9; roughness: 0.1"></a-cylinder>
+        <a-cylinder radius="0.04" height="0.55" position="0 0.275 0" color="#888"
+          material="metalness: 0.9; roughness: 0.1"></a-cylinder>
       </a-entity>
 
-    </a-scene>
+      <!-- MILKSHAKE -->
+      <a-entity id="trigger-milkshake" position="0 0.58 1.2">
+        <a-entity id="milkshake-glb" gltf-model="#milkshake-model" position="0 0.2 0" scale="0.13 0.13 0.13"></a-entity>
+        <a-light type="point" intensity="0.8" distance="2" color="#FFB6C1"></a-light>
+      </a-entity>
 
-    <script>
-      // ================================
-      // GESTION AUDIO
-      // ================================
-      const music = document.getElementById('twist-music');
-      const musicVolume = 0.7;
-      
-      // Fondu audio progressif
-      function fadeOutMusic(duration = 1500) {
-        const startVolume = music.volume;
-        const startTime = Date.now();
-        
-        function fade() {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          
-          // Courbe exponentielle pour un fondu naturel
-          music.volume = startVolume * Math.pow(1 - progress, 2);
-          
-          if (progress < 1) {
-            requestAnimationFrame(fade);
-          } else {
-            music.pause();
-            music.volume = 0;
-            console.log('🎵 Musique arrêtée');
-          }
+      <!-- HITBOX TRÈS GRANDE pour détection fiable -->
+      <a-box id="milkshake-hitbox" class="clickable" position="0 0.9 1.15" width="1.0" height="1.2" depth="1.0"
+        material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
+
+      <!-- NÉONS PLAFOND - BARRES LUMINEUSES HORIZONTALES -->
+      <!-- Barre néon rose 1 (avant) -->
+      <a-entity position="0 3.95 -1.8">
+        <a-box width="3.8" height="0.05" depth="0.05"
+          material="color: #FF1493; emissive: #FF1493; emissiveIntensity: 3; shader: flat"></a-box>
+        <a-light type="point" intensity="1.2" distance="4" color="#FF1493" position="0 0 0"></a-light>
+        <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="-1.5 0 0"></a-light>
+        <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="1.5 0 0"></a-light>
+      </a-entity>
+
+      <!-- Barre néon bleu cyan 2 (arrière) -->
+      <a-entity position="0 3.95 1.8">
+        <a-box width="3.8" height="0.05" depth="0.05"
+          material="color: #00CED1; emissive: #00CED1; emissiveIntensity: 3; shader: flat"></a-box>
+        <a-light type="point" intensity="1.2" distance="4" color="#00CED1" position="0 0 0"></a-light>
+        <a-light type="point" intensity="0.8" distance="3" color="#00CED1" position="-1.5 0 0"></a-light>
+        <a-light type="point" intensity="0.8" distance="3" color="#00CED1" position="1.5 0 0"></a-light>
+      </a-entity>
+
+
+
+      <!-- NÉONS TEXTE ORIGINAUX -->
+      <a-entity position="0 3.5 -1.95">
+        <a-text value="JACK RABBIT SLIM'S" align="center" color="#FF1493" scale="0.35 0.35 0.35"></a-text>
+        <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="0 0 0.1"></a-light>
+      </a-entity>
+
+
+      <!-- PANNEAU VR -->
+      <a-entity id="vr-help" position="0 2.5 1.5" rotation="0 180 0" visible="false">
+        <a-plane width="1.2" height="0.4" color="#000" opacity="0.8"></a-plane>
+        <a-text value="Pointez le milkshake\net appuyez sur la gâchette" position="0 0 0.01" align="center"
+          color="#FFD700" scale="0.4 0.4 0.4" width="2.5"></a-text>
+      </a-entity>
+
+      <!-- ÉCLAIRAGE -->
+      <a-light type="ambient" color="#331111" intensity="0.4"></a-light>
+      <a-light type="spot" position="0 3.9 0" rotation="-90 0 0" intensity="1.5" color="#FFFAF0" angle="50"
+        penumbra="0.3"></a-light>
+      <a-light type="point" position="-1.5 3 -1" intensity="0.6" color="#FF1493" distance="4"></a-light>
+      <a-light type="point" position="1.5 3 -1" intensity="0.6" color="#00CED1" distance="4"></a-light>
+      <a-light type="point" position="0 3 1.5" intensity="0.4" color="#FFD700" distance="3"></a-light>
+    </a-entity>
+
+    <!-- ========== SCÈNE B ========== -->
+    <a-entity id="scene-b" visible="false">
+      <a-entity id="briefcase" position="0 0.6 -1">
+        <a-box width="0.8" height="0.12" depth="0.5" color="#1a1a1a" material="metalness: 0.8; roughness: 0.2">
+          <a-box position="-0.28 0.07 0.26" width="0.06" height="0.015" depth="0.015" color="#D4AF37"
+            material="metalness: 1; roughness: 0.1"></a-box>
+          <a-box position="0.28 0.07 0.26" width="0.06" height="0.015" depth="0.015" color="#D4AF37"
+            material="metalness: 1; roughness: 0.1"></a-box>
+          <a-text value="CHANEL" position="0 0.065 0.251" align="center" color="#D4AF37"
+            scale="0.06 0.06 0.06"></a-text>
+        </a-box>
+        <a-entity position="0 0.06 -0.25" rotation="-115 0 0">
+          <a-box width="0.8" height="0.05" depth="0.5" position="0 0 0.25" color="#1a1a1a"
+            material="metalness: 0.8; roughness: 0.2"></a-box>
+        </a-entity>
+        <a-box width="0.7" height="0.01" depth="0.4" position="0 0.065 0"
+          material="color: #FFD700; shader: flat; emissive: #FFD700; emissiveIntensity: 8"></a-box>
+        <a-light type="point" intensity="10" color="#FFD700" position="0 0.5 0" distance="12"
+          animation__pulse="property: intensity; from: 8; to: 14; dur: 2000; dir: alternate; loop: true"></a-light>
+        <a-light type="point" intensity="3" color="#FFA500" position="0 0.2 0" distance="5"></a-light>
+      </a-entity>
+      <a-text id="mystery-text" value="What's in the box?" position="0 2.8 -1.5" align="center" color="#FFD700"
+        scale="0.5 0.5 0.5" opacity="0"></a-text>
+      <a-light type="ambient" color="#111" intensity="0.1"></a-light>
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    // ================================
+    // GESTION AUDIO
+    // ================================
+    const music = document.getElementById('twist-music');
+    const musicVolume = 0.35;
+
+    // Fondu audio progressif
+    function fadeOutMusic(duration = 1500) {
+      const startVolume = music.volume;
+      const startTime = Date.now();
+
+      function fade() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Courbe exponentielle pour un fondu naturel
+        music.volume = startVolume * Math.pow(1 - progress, 2);
+
+        if (progress < 1) {
+          requestAnimationFrame(fade);
+        } else {
+          music.pause();
+          music.volume = 0;
+          console.log('🎵 Musique arrêtée');
         }
-        fade();
       }
-      
-      // Écran de démarrage
-      document.getElementById('start-experience').addEventListener('click', () => {
-        document.getElementById('start-experience').style.display = 'none';
-        
-        music.volume = musicVolume;
-        music.play().then(() => {
-          console.log('🎵 Musique lancée');
-          updateDebug('🎵 ♪ You Never Can Tell ♪');
-        }).catch(err => {
-          console.warn('Audio bloqué:', err);
+      fade();
+    }
+
+    // Écran de démarrage
+    document.getElementById('start-experience').addEventListener('click', () => {
+      document.getElementById('start-experience').style.display = 'none';
+
+      music.volume = musicVolume;
+      music.play().then(() => {
+        console.log('🎵 Musique lancée');
+        updateDebug('🎵 ♪ You Never Can Tell ♪');
+      }).catch(err => {
+        console.warn('Audio bloqué:', err);
+      });
+    });
+
+    // ================================
+    // COMPOSANTS A-FRAME
+    // ================================
+    AFRAME.registerComponent('vr-click-handler', {
+      init: function () {
+        const el = this.el;
+
+        el.addEventListener('triggerdown', this.onClick.bind(this));
+        el.addEventListener('selectstart', this.onClick.bind(this));
+
+        el.addEventListener('raycaster-intersection', (evt) => {
+          const target = evt.detail.els[0];
+          if (target && target.classList.contains('clickable')) {
+            el.setAttribute('raycaster', 'lineColor', '#00FF00');
+          }
         });
-      });
 
-      // ================================
-      // COMPOSANTS A-FRAME
-      // ================================
-      AFRAME.registerComponent('vr-click-handler', {
-        init: function () {
-          const el = this.el;
-          
-          el.addEventListener('triggerdown', this.onClick.bind(this));
-          el.addEventListener('selectstart', this.onClick.bind(this));
-          
-          el.addEventListener('raycaster-intersection', (evt) => {
-            const target = evt.detail.els[0];
-            if (target && target.classList.contains('clickable')) {
-              el.setAttribute('raycaster', 'lineColor', '#00FF00');
-            }
-          });
-          
-          el.addEventListener('raycaster-intersection-cleared', () => {
-            el.setAttribute('raycaster', 'lineColor', '#FFD700');
-          });
-        },
-        
-        onClick: function () {
-          const raycaster = this.el.components.raycaster;
-          if (!raycaster) return;
-          
-          const intersections = raycaster.intersections;
-          if (intersections.length > 0) {
-            const target = intersections[0].object.el;
-            if (target && target.classList.contains('clickable')) {
-              target.emit('click');
-            }
+        el.addEventListener('raycaster-intersection-cleared', () => {
+          el.setAttribute('raycaster', 'lineColor', '#FFD700');
+        });
+      },
+
+      onClick: function () {
+        const raycaster = this.el.components.raycaster;
+        if (!raycaster) return;
+
+        const intersections = raycaster.intersections;
+        if (intersections.length > 0) {
+          const target = intersections[0].object.el;
+          if (target && target.classList.contains('clickable')) {
+            target.emit('click');
           }
         }
-      });
-
-      AFRAME.registerComponent('constrain-position', {
-        schema: {
-          min: { type: 'vec3', default: { x: -1.7, y: 0, z: -1.7 } },
-          max: { type: 'vec3', default: { x: 1.7, y: 0, z: 1.7 } }
-        },
-        tick: function () {
-          const pos = this.el.object3D.position;
-          const min = this.data.min;
-          const max = this.data.max;
-          if (pos.x < min.x) pos.x = min.x;
-          if (pos.x > max.x) pos.x = max.x;
-          if (pos.z < min.z) pos.z = min.z;
-          if (pos.z > max.z) pos.z = max.z;
-          pos.y = 0;
-        }
-      });
-
-      // ================================
-      // LOGIQUE PRINCIPALE
-      // ================================
-      function updateDebug(msg) {
-        const d = document.getElementById('debug');
-        if (d) { d.innerHTML += `<br>${msg}`; d.scrollTop = d.scrollHeight; }
-        console.log(msg);
       }
+    });
 
-      document.addEventListener('DOMContentLoaded', () => {
-        updateDebug('🎬 Chanel x Pulp Fiction');
-        updateDebug('─────────────────');
-        
-        const scene = document.querySelector('a-scene');
-        
-        scene.addEventListener('loaded', () => {
-          updateDebug('✅ Scène chargée');
-          updateDebug('🎮 Desktop: ZQSD + clic');
-          updateDebug('🥽 VR: Gâchette');
-          
-          const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
-          const desktopCursor = document.querySelector('#desktop-cursor');
-          const blackOut = document.querySelector('#black-out');
-          const sceneA = document.querySelector('#scene-a');
-          const sceneB = document.querySelector('#scene-b');
-          const room = document.querySelector('#room');
-          const floor = document.querySelector('#floor');
-          const instructions = document.getElementById('instructions');
-          const controls = document.getElementById('controls');
-          const mysteryText = document.querySelector('#mystery-text');
-          const vrHelp = document.querySelector('#vr-help');
+    AFRAME.registerComponent('constrain-position', {
+      schema: {
+        min: { type: 'vec3', default: { x: -1.7, y: 0, z: -1.7 } },
+        max: { type: 'vec3', default: { x: 1.7, y: 0, z: 1.7 } }
+      },
+      tick: function () {
+        const pos = this.el.object3D.position;
+        const min = this.data.min;
+        const max = this.data.max;
+        if (pos.x < min.x) pos.x = min.x;
+        if (pos.x > max.x) pos.x = max.x;
+        if (pos.z < min.z) pos.z = min.z;
+        if (pos.z > max.z) pos.z = max.z;
+        pos.y = 0;
+      }
+    });
 
-          let transitionDone = false;
+    // ================================
+    // LOGIQUE PRINCIPALE
+    // ================================
+    function updateDebug(msg) {
+      const d = document.getElementById('debug');
+      if (d) { d.innerHTML += `<br>${msg}`; d.scrollTop = d.scrollHeight; }
+      console.log(msg);
+    }
 
-          // Fonction de transition
-          function transitionToSceneB() {
-            if (transitionDone) return;
-            transitionDone = true;
-            updateDebug('🎞️ CUT !');
-            
-            // ====== FONDU AUDIO ======
-            updateDebug('🎵 Fondu musical...');
-            fadeOutMusic(1500);
-            
-            if (instructions) instructions.innerHTML = 'THE MYSTERY';
-            if (controls) controls.style.display = 'none';
-            milkshakeHitbox.classList.remove('clickable');
+    document.addEventListener('DOMContentLoaded', () => {
+      updateDebug('🎬 Chanel x Pulp Fiction');
+      updateDebug('─────────────────');
 
-            blackOut.setAttribute('visible', 'true');
-            blackOut.setAttribute('animation__fadeIn', { 
-              property: 'material.opacity', from: 0, to: 1, dur: 200, easing: 'easeInQuad' 
-            });
+      const scene = document.querySelector('a-scene');
+
+      scene.addEventListener('loaded', () => {
+        updateDebug('✅ Scène chargée');
+        updateDebug('🎮 Desktop: ZQSD + clic');
+        updateDebug('🥽 VR: Gâchette');
+
+        const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
+        const desktopCursor = document.querySelector('#desktop-cursor');
+        const blackOut = document.querySelector('#black-out');
+        const sceneA = document.querySelector('#scene-a');
+        const sceneB = document.querySelector('#scene-b');
+        const room = document.querySelector('#room');
+        const floor = document.querySelector('#floor');
+        const instructions = document.getElementById('instructions');
+        const controls = document.getElementById('controls');
+        const mysteryText = document.querySelector('#mystery-text');
+        const vrHelp = document.querySelector('#vr-help');
+
+        let transitionDone = false;
+
+        // Fonction de transition
+        function transitionToSceneB() {
+          if (transitionDone) return;
+          transitionDone = true;
+          updateDebug('🎞️ CUT !');
+
+          // ====== FONDU AUDIO ======
+          updateDebug('🎵 Fondu musical...');
+          fadeOutMusic(1500);
+
+          if (instructions) instructions.innerHTML = 'THE MYSTERY';
+          if (controls) controls.style.display = 'none';
+          milkshakeHitbox.classList.remove('clickable');
+
+          blackOut.setAttribute('visible', 'true');
+          blackOut.setAttribute('animation__fadeIn', {
+            property: 'material.opacity', from: 0, to: 1, dur: 200, easing: 'easeInQuad'
+          });
+
+          setTimeout(() => {
+            sceneA.setAttribute('visible', 'false');
+            sceneB.setAttribute('visible', 'true');
+            room.setAttribute('material', { color: '#050505', metalness: 0.95, roughness: 0.05, side: 'back' });
+            floor.setAttribute('material', { color: '#030303', metalness: 0.9, roughness: 0.1 });
+            document.querySelector('#rig').object3D.position.set(0, 0, 1);
 
             setTimeout(() => {
-              sceneA.setAttribute('visible', 'false');
-              sceneB.setAttribute('visible', 'true');
-              room.setAttribute('material', { color: '#050505', metalness: 0.95, roughness: 0.05, side: 'back' });
-              floor.setAttribute('material', { color: '#030303', metalness: 0.9, roughness: 0.1 });
-              document.querySelector('#rig').object3D.position.set(0, 0, 1);
-
+              blackOut.setAttribute('animation__fadeOut', {
+                property: 'material.opacity', from: 1, to: 0, dur: 1500, easing: 'easeOutCubic'
+              });
               setTimeout(() => {
-                blackOut.setAttribute('animation__fadeOut', { 
-                  property: 'material.opacity', from: 1, to: 0, dur: 1500, easing: 'easeOutCubic' 
-                });
-                setTimeout(() => {
-                  mysteryText.setAttribute('animation__appear', { property: 'opacity', from: 0, to: 0.9, dur: 2000 });
-                }, 800);
-                setTimeout(() => {
-                  blackOut.setAttribute('visible', 'false');
-                  updateDebug('✅ Révélation');
-                  updateDebug('💼 La Mallette...');
-                }, 1600);
-              }, 150);
-            }, 250);
-          }
+                mysteryText.setAttribute('animation__appear', { property: 'opacity', from: 0, to: 0.9, dur: 2000 });
+              }, 800);
+              setTimeout(() => {
+                blackOut.setAttribute('visible', 'false');
+                updateDebug('✅ Révélation');
+                updateDebug('💼 La Mallette...');
+              }, 1600);
+            }, 150);
+          }, 250);
+        }
 
-          // ====== MÉTHODE 1: Clic direct sur la hitbox ======
-          milkshakeHitbox.addEventListener('click', () => {
-            updateDebug('🥤 Click direct hitbox');
-            transitionToSceneB();
+        // ====== MÉTHODE 1: Clic direct sur la hitbox ======
+        milkshakeHitbox.addEventListener('click', () => {
+          updateDebug('🥤 Click direct hitbox');
+          transitionToSceneB();
+        });
+
+        // ====== MÉTHODE 2: Via le curseur desktop ======
+        if (desktopCursor) {
+          desktopCursor.addEventListener('click', (evt) => {
+            if (transitionDone) return;
+            const intersectedEl = evt.detail?.intersectedEl;
+            updateDebug('🖱️ Cursor click: ' + (intersectedEl ? intersectedEl.id : 'none'));
+            if (intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
+              transitionToSceneB();
+            }
           });
+        }
 
-          // ====== MÉTHODE 2: Via le curseur desktop ======
-          if (desktopCursor) {
-            desktopCursor.addEventListener('click', (evt) => {
-              if (transitionDone) return;
-              const intersectedEl = evt.detail?.intersectedEl;
-              updateDebug('🖱️ Cursor click: ' + (intersectedEl ? intersectedEl.id : 'none'));
-              if (intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
+        // ====== MÉTHODE 3: Clic souris global (backup) ======
+        document.addEventListener('click', (evt) => {
+          if (transitionDone) return;
+          // Ignorer si c'est l'écran de démarrage
+          if (document.getElementById('start-experience').style.display !== 'none') return;
+
+          // Vérifier via raycaster de la caméra
+          const cam = document.querySelector('#cam');
+          if (cam && cam.components.raycaster) {
+            const intersections = cam.components.raycaster.intersections;
+            if (intersections && intersections.length > 0) {
+              const hit = intersections[0].object.el;
+              if (hit && hit.id === 'milkshake-hitbox') {
+                updateDebug('🖱️ Mouse raycaster hit');
                 transitionToSceneB();
               }
-            });
+            }
           }
-
-          // ====== MÉTHODE 3: Clic souris global (backup) ======
-          document.addEventListener('click', (evt) => {
-            if (transitionDone) return;
-            // Ignorer si c'est l'écran de démarrage
-            if (document.getElementById('start-experience').style.display !== 'none') return;
-            
-            // Vérifier via raycaster de la caméra
-            const cam = document.querySelector('#cam');
-            if (cam && cam.components.raycaster) {
-              const intersections = cam.components.raycaster.intersections;
-              if (intersections && intersections.length > 0) {
-                const hit = intersections[0].object.el;
-                if (hit && hit.id === 'milkshake-hitbox') {
-                  updateDebug('🖱️ Mouse raycaster hit');
-                  transitionToSceneB();
-                }
-              }
-            }
-          });
-
-          // Mode VR
-          scene.addEventListener('enter-vr', () => {
-            updateDebug('🥽 Mode VR activé');
-            if (vrHelp) vrHelp.setAttribute('visible', 'true');
-            document.querySelector('#desktop-cursor')?.setAttribute('visible', 'false');
-            
-            // Démarrer musique en VR
-            if (music.paused) {
-              music.volume = musicVolume;
-              music.play().catch(e => console.warn('Audio VR:', e));
-            }
-          });
-          
-          scene.addEventListener('exit-vr', () => {
-            updateDebug('🖥️ Mode Desktop');
-            if (vrHelp) vrHelp.setAttribute('visible', 'false');
-            document.querySelector('#desktop-cursor')?.setAttribute('visible', 'true');
-          });
-
-          updateDebug('─────────────────');
-          updateDebug('👆 Pointez le shake');
         });
+
+        // Mode VR
+        scene.addEventListener('enter-vr', () => {
+          updateDebug('🥽 Mode VR activé');
+          if (vrHelp) vrHelp.setAttribute('visible', 'true');
+          document.querySelector('#desktop-cursor')?.setAttribute('visible', 'false');
+
+          // Démarrer musique en VR
+          if (music.paused) {
+            music.volume = musicVolume;
+            music.play().catch(e => console.warn('Audio VR:', e));
+          }
+        });
+
+        scene.addEventListener('exit-vr', () => {
+          updateDebug('🖥️ Mode Desktop');
+          if (vrHelp) vrHelp.setAttribute('visible', 'false');
+          document.querySelector('#desktop-cursor')?.setAttribute('visible', 'true');
+        });
+
+        updateDebug('─────────────────');
+        updateDebug('👆 Pointez le shake');
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
+
 </html>
