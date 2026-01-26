@@ -177,6 +177,15 @@
                   width="4">
           </a-text>
           
+          <!-- Sous-titre -->
+          <a-text id="chanel-subtitle" 
+                  value="The Golden Key" 
+                  position="0 0 0.01" 
+                  align="center" 
+                  color="#666666"
+                  scale="0.5 0.5 0.5"
+                  width="4">
+          </a-text>
           
           <!-- Bouton Recommencer -->
           <a-entity id="restart-button" position="0 -0.6 0.01">
@@ -516,125 +525,8 @@
 
     // Fonction de reset complète (utilisée par le bouton VR)
     function resetExperience() {
-      const sceneA = document.querySelector('#scene-a');
-      const sceneB = document.querySelector('#scene-b');
-      const chanelScreen = document.querySelector('#chanel-screen');
-      const room = document.querySelector('#room');
-      const floor = document.querySelector('#floor');
-      const blackOut = document.querySelector('#black-out');
-      const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
-      const mysteryText = document.querySelector('#mystery-text');
-      
-      // Cacher l'écran Chanel
-      chanelScreen.setAttribute('visible', 'false');
-      
-      // Réafficher les éléments UI
-      document.getElementById('debug').style.display = 'block';
-      document.getElementById('instructions').style.display = 'block';
-      document.getElementById('title').style.display = 'block';
-      document.getElementById('instructions').innerHTML = 'Cliquez sur le $5 Shake';
-      
-      // Réinitialiser le debug
-      document.getElementById('debug').innerHTML = 'Initialisation...';
-      updateDebug('🎬 Chanel x Pulp Fiction');
-      updateDebug('─────────────────');
-      updateDebug('🔄 Simulation relancée');
-      
-      // Remettre scène A, cacher B
-      sceneB.setAttribute('visible', 'false');
-      sceneA.setAttribute('visible', 'true');
-      
-      // Réinitialiser les murs et sol
-      room.setAttribute('material', {
-        color: '#1a0a0a',
-        metalness: 0.3,
-        roughness: 0.7,
-        side: 'back'
-      });
-      
-      floor.setAttribute('material', {
-        color: '#111',
-        metalness: 0.5,
-        roughness: 0.5
-      });
-      
-      // Repositionner le joueur
-      document.querySelector('#rig').object3D.position.set(0, 0, 0);
-      
-      // Réactiver la hitbox du milkshake
-      milkshakeHitbox.classList.add('clickable');
-      
-      // Réinitialiser le pistolet
-      const pistolContainer = document.querySelector('#pistol-container');
-      const pistolModel = document.querySelector('#pistol-model-b');
-      const pistolHitbox = document.querySelector('#pistol-hitbox');
-      const pistolLight = document.querySelector('#pistol-light');
-      
-      if (pistolContainer) {
-        pistolContainer.removeAttribute('animation__levitate');
-        pistolContainer.removeAttribute('animation__float');
-        pistolContainer.setAttribute('position', '-0.6 0.6 -0.8');
-      }
-      if (pistolModel) {
-        pistolModel.removeAttribute('animation__straighten');
-        pistolModel.removeAttribute('animation__spin');
-        pistolModel.setAttribute('rotation', '90 -215.700 0');
-      }
-      if (pistolHitbox) {
-        pistolHitbox.classList.add('clickable');
-        pistolHitbox.setAttribute('position', '0 0.2 0.1');
-      }
-      if (pistolLight) {
-        pistolLight.removeAttribute('animation__glow');
-        pistolLight.setAttribute('intensity', '0.3');
-      }
-      
-      // Réinitialiser la clé
-      const keyContainer = document.querySelector('#key-container');
-      const keyModel = document.querySelector('#key-model');
-      const keyHitbox = document.querySelector('#key-hitbox');
-      const keyLight = document.querySelector('#key-light');
-      
-      if (keyContainer) {
-        keyContainer.removeAttribute('animation__levitate');
-        keyContainer.removeAttribute('animation__float');
-        keyContainer.setAttribute('position', '0.7 0.6 -0.8');
-      }
-      if (keyModel) {
-        keyModel.removeAttribute('animation__straighten');
-        keyModel.removeAttribute('animation__spin');
-        keyModel.setAttribute('rotation', '90 0 0');
-      }
-      if (keyHitbox) {
-        keyHitbox.classList.add('clickable');
-        keyHitbox.setAttribute('position', '0 0.2 0.1');
-      }
-      if (keyLight) {
-        keyLight.removeAttribute('animation__glow');
-        keyLight.setAttribute('intensity', '0.5');
-      }
-      
-      // Réinitialiser le texte mystère
-      mysteryText.removeAttribute('animation__appear');
-      mysteryText.setAttribute('opacity', '0');
-      
-      // Réinitialiser le blackout
-      blackOut.setAttribute('material', 'color', '#000000');
-      blackOut.setAttribute('material', 'opacity', '0');
-      blackOut.setAttribute('visible', 'false');
-      
-      // Réinitialiser les états globaux
-      globalTransitionDone = false;
-      globalPistolActivated = false;
-      globalKeyActivated = false;
-      
-      // Relancer la musique
-      music.volume = musicVolume;
-      music.currentTime = 0;
-      music.play().catch(e => console.warn('Audio:', e));
-      
-      updateDebug('🎵 ♪ You Never Can Tell ♪');
-      updateDebug('👆 Pointez le shake');
+      // Rafraîchir la page pour tout réinitialiser proprement
+      location.reload();
     }
 
     AFRAME.registerComponent('vr-click-handler', {
@@ -981,7 +873,7 @@
                   }, 200);
                 }, 800);
               }, 300);
-            }, 2500); // Délai après le début de la rotation
+            }, 1000); // Délai réduit - son pistolet plus tôt
             
           }, 1500);
         }
