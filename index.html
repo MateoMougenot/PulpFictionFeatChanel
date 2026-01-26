@@ -137,6 +137,7 @@
       <a-asset-item id="blood-model" src="./assets/models/Blood.glb"></a-asset-item>
       <a-asset-item id="pistol-model" src="./assets/models/pistol.glb"></a-asset-item>
       <a-asset-item id="valise-model" src="./assets/models/valise.glb"></a-asset-item>
+      <a-asset-item id="golden-key-model" src="./assets/models/the_golden_key.glb"></a-asset-item>
     </a-assets>
 
     <!-- CAMERA RIG -->
@@ -222,14 +223,14 @@
 
       <!-- KITCHEN BAR -->
       <a-entity id="bar" position="-0.3 0 0.4" scale="1.5 1.5 1.5">
-        <a-entity gltf-model="#kitchen-bar-model" position="0 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
-        <a-entity gltf-model="#kitchen-bar-model" position="0.5 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
-        <a-entity gltf-model="#kitchen-bar-model" position="1 0 -1.3" rotation="0 0 0" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="0 0 -1.3" rotation="0 0 0" scale="1.2 2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="0.5 0 -1.3" rotation="0 0 0" scale="1.2 2 1.2"></a-entity>
+        <a-entity gltf-model="#kitchen-bar-model" position="1 0 -1.3" rotation="0 0 0" scale="1.2 2 1.2"></a-entity>
         <a-entity gltf-model="#kitchen-bar-model" position="0.747 0 -1.802" rotation="0 90 0"
-          scale="1.2 1.2 1.2"></a-entity>
-        <a-entity gltf-model="#glass1" position="0.870 0.645 -1.300" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
-        <a-entity gltf-model="#glass1" position="-0.415 0.645 -1.149" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
-        <a-entity gltf-model="#glass2" position="0.071 0.505 -1.136" rotation="0 0 0" scale="0.1 0.1 0.1"></a-entity>
+          scale="1.2 2 1.2"></a-entity>
+        <a-entity gltf-model="#glass1" position="0.870 1 -1.300" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
+        <a-entity gltf-model="#glass1" position="-0.415 1 -1.149" rotation="0 0 0" scale="0.2 0.2 0.2"></a-entity>
+        <a-entity gltf-model="#glass2" position="0.071 0.850 -1.136" rotation="0 0 0" scale="0.1 0.1 0.1"></a-entity>
       </a-entity>
 
       <!-- FLAQUE DE SANG AVEC PISTOLET -->
@@ -298,46 +299,77 @@
       <a-light type="point" position="0 3 1.5" intensity="0.4" color="#FFD700" distance="3"></a-light>
     </a-entity>
 
-    <!-- ========== SCÈNE B : LA MALLETTE PULP FICTION ========== -->
+    <!-- ========== SCÈNE B : LES MALLETTES PULP FICTION ========== -->
     <a-entity id="scene-b" visible="false">
 
-      <!-- PIÉDESTAL -->
-      <a-entity id="pedestal" position="0 0 -0.8">
-        <a-cylinder radius="0.5" height="0.08" position="0 0.04 0"
+      <!-- ====== MALLETTE 1 : PISTOLET (gauche) ====== -->
+      <a-entity id="briefcase-1" position="-0.6 0 -0.8">
+        <!-- Piédestal -->
+        <a-cylinder radius="0.4" height="0.06" position="0 0.03 0"
           material="color: #1a1a1a; metalness: 0.9; roughness: 0.1"></a-cylinder>
-        <a-cylinder radius="0.15" height="0.5" position="0 0.33 0"
+        <a-cylinder radius="0.12" height="0.45" position="0 0.28 0"
           material="color: #111; metalness: 0.8; roughness: 0.2"></a-cylinder>
-        <a-cylinder radius="0.45" height="0.05" position="0 0.6 0"
+        <a-cylinder radius="0.35" height="0.04" position="0 0.52 0"
           material="color: #1a1a1a; metalness: 0.9; roughness: 0.1"></a-cylinder>
+        
+        <!-- Mallette -->
+        <a-entity id ="mallette" gltf-model="#valise-model" position="0 0.61 0" rotation="0 125 0" scale="0.35 0.35 0.35"></a-entity>
+        
+        <!-- Lumière mallette -->
+        <a-light type="point" intensity="6" color="#FFD700" position="0 0.9 0" distance="3"
+          animation__pulse="property: intensity; from: 4; to: 8; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine"></a-light>
       </a-entity>
 
-      <!-- MALLETTE (modèle GLB) -->
-      <a-entity id="briefcase" position="0 0.65 -0.8">
-        <a-entity gltf-model="#valise-model" position="0 0.052 0" rotation="0 100 0" scale="0.4 0.4 0.4">
-        </a-entity>
-
-        <!-- Lumière divine émanant de la mallette -->
-        <a-light type="point" intensity="8" color="#FFD700" position="0 0.3 0" distance="4"
-          animation__pulse="property: intensity; from: 6; to: 12; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine"></a-light>
-        <a-light type="point" intensity="2" color="#FFA500" position="0 0.1 0" distance="2"></a-light>
-      </a-entity>
-
-      <!-- PISTOLET INTERACTIF -->
-      <a-entity id="pistol-container" position="-0.043 0.664 -0.844">
+      <!-- PISTOLET INTERACTIF (mallette 1) -->
+      <a-entity id="pistol-container" position="-0.6 0.6 -0.8">
         <a-entity id="pistol-model-b" 
                   gltf-model="#pistol-model" 
                   position="0 0 0" 
                   rotation="90 -215.700 0"
-                  scale="0.1 0.1 0.1">
+                  scale="0.08 0.08 0.08">
         </a-entity>
-        <!-- Hitbox cliquable -->
+        <!-- Hitbox GRANDE -->
         <a-box id="pistol-hitbox" 
                class="clickable" 
-               position="0 0 0" 
-               width="0.3" height="0.2" depth="0.3"
-               material="opacity: 0.001; transparent: true"></a-box>
-        <!-- Lumière subtile -->
-        <a-light id="pistol-light" type="point" intensity="0.2" distance="1" color="#FF4444" position="0 0.05 0"></a-light>
+               position="0 0.1 0" 
+               width="0.7" height="0.5" depth="0.7"
+               material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
+        <a-light id="pistol-light" type="point" intensity="0.3" distance="1" color="#FF4444" position="0 0.05 0"></a-light>
+      </a-entity>
+
+      <!-- ====== MALLETTE 2 : CLÉ DORÉE (droite) ====== -->
+      <a-entity id="briefcase-2" position="0.6 0 -0.8">
+        <!-- Piédestal -->
+        <a-cylinder radius="0.4" height="0.06" position="0 0.03 0"
+          material="color: #1a1a1a; metalness: 0.9; roughness: 0.1"></a-cylinder>
+        <a-cylinder radius="0.12" height="0.45" position="0 0.28 0"
+          material="color: #111; metalness: 0.8; roughness: 0.2"></a-cylinder>
+        <a-cylinder radius="0.35" height="0.04" position="0 0.52 0"
+          material="color: #1a1a1a; metalness: 0.9; roughness: 0.1"></a-cylinder>
+        
+        <!-- Mallette -->
+        <a-entity id="mallette" gltf-model="#valise-model" position="0 0.61 0" rotation="0 100 0" scale="0.35 0.35 0.35"></a-entity>
+        
+        <!-- Lumière mallette -->
+        <a-light type="point" intensity="6" color="#FFFFF" position="0 0.9 0" distance="3"
+          animation__pulse2="property: intensity; from: 4; to: 8; dur: 2500; dir: alternate; loop: true; easing: easeInOutSine"></a-light>
+      </a-entity>
+
+      <!-- CLÉ DORÉE INTERACTIVE (mallette 2) -->
+      <a-entity id="key-container" position="0.7 0.6 -0.8">
+        <a-entity id="key-model" 
+                  gltf-model="#golden-key-model" 
+                  position="0 0 0" 
+                  rotation="90 0 0"
+                  scale="0.0005 0.0005 0.0005">
+        </a-entity>
+        <!-- Hitbox GRANDE -->
+        <a-box id="key-hitbox" 
+               class="clickable" 
+               position="0 0.1 0" 
+               width="0.7" height="0.5" depth="0.7"
+               material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
+        <a-light id="key-light" type="point" intensity="0.5" distance="1.5" color="#FFD700" position="0 0.05 0"></a-light>
       </a-entity>
 
       <!-- ÉCLAIRAGE ROUGE DIFFUS PULP FICTION -->
@@ -349,9 +381,11 @@
       <a-light type="point" color="#660000" intensity="0.6" distance="4" position="0 2 1.8"></a-light>
       <a-light type="point" color="#660000" intensity="0.6" distance="4" position="0 2 -1.8"></a-light>
 
-      <!-- Spot sur la mallette -->
-      <a-light type="spot" color="#FFFAF0" intensity="1.5" distance="4" angle="35" penumbra="0.5"
-        position="0 3.5 -0.5"></a-light>
+      <!-- Spots sur les mallettes -->
+      <a-light type="spot" color="#FFFAF0" intensity="1.2" distance="4" angle="30" penumbra="0.5"
+        position="-0.6 3.5 -0.5"></a-light>
+      <a-light type="spot" color="#FFFAF0" intensity="1.2" distance="4" angle="30" penumbra="0.5"
+        position="0.6 3.5 -0.5"></a-light>
 
       <!-- Lueur rouge au sol -->
       <a-light type="point" color="#8B0000" intensity="0.5" distance="3" position="0 0.1 0"></a-light>
@@ -360,7 +394,7 @@
       <a-light type="point" color="#4A0000" intensity="0.4" distance="4" position="0 3.9 0"></a-light>
 
       <!-- Texte mystère -->
-      <a-text id="mystery-text" value="What's in the box?" position="0 2.8 -1.5" align="center" color="#FFD700"
+      <a-text id="mystery-text" value="Choose your way" position="0 2.5 -1.5" align="center" color="#FFD700"
         scale="0.6 0.6 0.6" opacity="0"
         animation__float="property: position; from: 0 2.8 -1.5; to: 0 2.85 -1.5; dur: 2000; dir: alternate; loop: true">
       </a-text>
@@ -373,6 +407,8 @@
           animation__float2="property: position; to: -0.1 0.4 -0.05; dur: 3500; dir: alternate; loop: true"></a-sphere>
         <a-sphere radius="0.012" position="0.1 0.4 0.05" material="color: #FFD700; opacity: 0.25; transparent: true"
           animation__float3="property: position; to: 0.05 0.6 0.1; dur: 4500; dir: alternate; loop: true"></a-sphere>
+        <a-sphere radius="0.009" position="-0.3 0.35 0.2" material="color: #FFD700; opacity: 0.2; transparent: true"
+          animation__float4="property: position; to: -0.25 0.55 0.25; dur: 3800; dir: alternate; loop: true"></a-sphere>
       </a-entity>
 
     </a-entity>
@@ -499,6 +535,7 @@
 
         let transitionDone = false;
         let pistolActivated = false;
+        let keyActivated = false;
 
         function transitionToSceneB() {
           if (transitionDone) return;
@@ -550,8 +587,9 @@
               setTimeout(() => {
                 blackOut.setAttribute('visible', 'false');
                 updateDebug('✅ Révélation');
-                updateDebug('💼 La Mallette...');
+                updateDebug('💼 Les Mallettes...');
                 updateDebug('🔫 Cliquez sur le pistolet');
+                updateDebug('🔑 Cliquez sur la clé');
               }, 2100);
             }, 200);
           }, 300);
@@ -590,7 +628,7 @@
           // Animation de lévitation (le conteneur monte)
           pistolContainer.setAttribute('animation__levitate', {
             property: 'position',
-            to: '-0.043 1.3 -0.844',
+            to: '-0.6 1.4 -0.8',
             dur: 2000,
             easing: 'easeOutCubic'
           });
@@ -617,8 +655,8 @@
             // Ajouter une légère oscillation verticale
             pistolContainer.setAttribute('animation__float', {
               property: 'position',
-              from: '-0.043 1.3 -0.844',
-              to: '-0.043 1.4 -0.844',
+              from: '-0.6 1.4 -0.8',
+              to: '-0.6 1.5 -0.8',
               dur: 2000,
               dir: 'alternate',
               loop: true,
@@ -629,12 +667,93 @@
           }, 1500);
         }
 
+        // ====== CLÉ DORÉE INTERACTIVE - SCÈNE B ======
+        function activateKey() {
+          if (keyActivated) return;
+          keyActivated = true;
+          
+          updateDebug('🔑 Clé activée !');
+          
+          const keyContainer = document.querySelector('#key-container');
+          const keyModel = document.querySelector('#key-model');
+          const keyLight = document.querySelector('#key-light');
+          const keyHitbox = document.querySelector('#key-hitbox');
+          
+          if (!keyContainer || !keyModel) {
+            console.warn('Clé non trouvée');
+            return;
+          }
+          
+          // Retirer la classe clickable
+          if (keyHitbox) keyHitbox.classList.remove('clickable');
+          
+          // Intensifier la lumière
+          if (keyLight) {
+            keyLight.setAttribute('animation__glow', {
+              property: 'intensity',
+              to: 2,
+              dur: 1000,
+              easing: 'easeOutQuad'
+            });
+          }
+          
+          // Animation de lévitation (le conteneur monte)
+          keyContainer.setAttribute('animation__levitate', {
+            property: 'position',
+            to: '0.6 1.4 -0.8',
+            dur: 2000,
+            easing: 'easeOutCubic'
+          });
+          
+          // Animation de redressement (le modèle se redresse)
+          keyModel.setAttribute('animation__straighten', {
+            property: 'rotation',
+            to: '0 0 0',
+            dur: 1500,
+            easing: 'easeOutBack'
+          });
+          
+          // Animation de rotation infinie (après le redressement)
+          setTimeout(() => {
+            keyModel.setAttribute('animation__spin', {
+              property: 'rotation',
+              from: '0 0 0',
+              to: '0 360 0',
+              dur: 4000,
+              loop: true,
+              easing: 'linear'
+            });
+            
+            // Ajouter une légère oscillation verticale
+            keyContainer.setAttribute('animation__float', {
+              property: 'position',
+              from: '0.6 1.4 -0.8',
+              to: '0.6 1.5 -0.8',
+              dur: 2500,
+              dir: 'alternate',
+              loop: true,
+              easing: 'easeInOutSine'
+            });
+            
+            updateDebug('🔑 Lévitation activée');
+          }, 1500);
+        }
+
         // Clic sur le pistolet (hitbox)
         const pistolHitbox = document.querySelector('#pistol-hitbox');
         if (pistolHitbox) {
           pistolHitbox.addEventListener('click', () => {
             updateDebug('🔫 Clic pistolet');
             activatePistol();
+          });
+        }
+
+        // Clic sur la clé (hitbox)
+        const keyHitbox = document.querySelector('#key-hitbox');
+        if (keyHitbox) {
+          keyHitbox.addEventListener('click', () => {
+            updateDebug('🔑 Clic clé');
+            activateKey();
           });
         }
 
@@ -657,6 +776,11 @@
             if (!pistolActivated && intersectedEl && intersectedEl.id === 'pistol-hitbox') {
               activatePistol();
             }
+            
+            // Vérifier clé
+            if (!keyActivated && intersectedEl && intersectedEl.id === 'key-hitbox') {
+              activateKey();
+            }
           });
         }
 
@@ -675,6 +799,10 @@
               
               if (!pistolActivated && hit && hit.id === 'pistol-hitbox') {
                 activatePistol();
+              }
+              
+              if (!keyActivated && hit && hit.id === 'key-hitbox') {
+                activateKey();
               }
             }
           }
