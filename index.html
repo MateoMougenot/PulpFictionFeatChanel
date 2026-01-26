@@ -158,6 +158,51 @@
         <a-plane id="black-out" position="0 0 -0.3" width="6" height="6"
           material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" visible="false">
         </a-plane>
+
+        <!-- ========== ÉCRAN FINAL CHANEL (fixé à la caméra) ========== -->
+        <a-entity id="chanel-screen" visible="false" position="0 0 -2">
+          
+          <!-- Fond blanc -->
+          <a-plane width="4" height="3" 
+                   material="color: #FFFFFF; shader: flat">
+          </a-plane>
+          
+          <!-- Logo CHANEL -->
+          <a-text id="chanel-logo" 
+                  value="CHANEL" 
+                  position="0 0.5 0.01" 
+                  align="center" 
+                  color="#000000"
+                  scale="1.2 1.2 1.2"
+                  width="4">
+          </a-text>
+          
+          
+          <!-- Bouton Recommencer -->
+          <a-entity id="restart-button" position="0 -0.6 0.01">
+            <!-- Fond du bouton -->
+            <a-plane id="restart-btn-bg" 
+                     width="1.2" height="0.25"
+                     material="color: #000000; shader: flat">
+            </a-plane>
+            <!-- Texte du bouton -->
+            <a-text value="RECOMMENCER" 
+                    position="0 0 0.01" 
+                    align="center" 
+                    color="#FFFFFF"
+                    scale="0.4 0.4 0.4"
+                    width="3">
+            </a-text>
+            <!-- Hitbox pour le clic -->
+            <a-box id="restart-hitbox"
+                   class="clickable"
+                   position="0 0 0.05"
+                   width="1.4" height="0.4" depth="0.2"
+                   material="opacity: 0.001; transparent: true; side: double"></a-box>
+          </a-entity>
+          
+        </a-entity>
+
       </a-camera>
 
       <a-entity id="left-hand" laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
@@ -241,7 +286,7 @@
       <a-entity position="0.5 0 -0.8">
         <a-entity id="blood" gltf-model="#blood-model" position="0 0.038 1.778" rotation="0 0 0"
           scale="0.6 0.6 0.6"></a-entity>
-        <a-entity id="pistol" gltf-model="#pistol-model" position="0 0.150 1.536" rotation="90 45 0"
+        <a-entity id="pistol" gltf-model="#pistol-model" position="0 0.057 1.536" rotation="90 45 0"
           scale="0.1 0.1 0.1"></a-entity>
         <a-light type="point" intensity="0.4" distance="2" color="#FF6347" position="0 0.2 0"></a-light>
       </a-entity>
@@ -417,63 +462,6 @@
 
     </a-entity>
 
-    <!-- ========== SCÈNE C : ÉCRAN FINAL CHANEL ========== -->
-    <a-entity id="scene-c" visible="false">
-      
-      <!-- Fond blanc -->
-      <a-box position="0 2 -3" width="8" height="6" depth="0.1" 
-             material="color: #FFFFFF; shader: flat"></a-box>
-      
-      <!-- Logo CHANEL -->
-      <a-text id="chanel-logo" 
-              value="CHANEL" 
-              position="0 2.5 -2.9" 
-              align="center" 
-              color="#000000"
-              font="mozillavr"
-              scale="1.5 1.5 1.5"
-              width="4">
-      </a-text>
-      
-      <!-- Sous-titre -->
-      <a-text id="chanel-subtitle" 
-              value="The Golden Key" 
-              position="0 1.8 -2.9" 
-              align="center" 
-              color="#666666"
-              scale="0.6 0.6 0.6"
-              width="4">
-      </a-text>
-      
-      <!-- Bouton Recommencer -->
-      <a-entity id="restart-button" position="0 1 -2.9">
-        <!-- Fond du bouton -->
-        <a-box id="restart-btn-bg" 
-               class="clickable"
-               width="1.8" height="0.4" depth="0.05"
-               material="color: #000000; shader: flat">
-        </a-box>
-        <!-- Texte du bouton -->
-        <a-text value="RECOMMENCER" 
-                position="0 0 0.03" 
-                align="center" 
-                color="#FFFFFF"
-                scale="0.5 0.5 0.5"
-                width="3">
-        </a-text>
-        <!-- Hitbox pour le clic -->
-        <a-box id="restart-hitbox"
-               class="clickable"
-               position="0 0 0.1"
-               width="2" height="0.6" depth="0.3"
-               material="opacity: 0.001; transparent: true"></a-box>
-      </a-entity>
-      
-      <!-- Lumière pour la scène finale -->
-      <a-light type="ambient" color="#FFFFFF" intensity="1"></a-light>
-      
-    </a-entity>
-
   </a-scene>
 
   <script>
@@ -530,12 +518,15 @@
     function resetExperience() {
       const sceneA = document.querySelector('#scene-a');
       const sceneB = document.querySelector('#scene-b');
-      const sceneC = document.querySelector('#scene-c');
+      const chanelScreen = document.querySelector('#chanel-screen');
       const room = document.querySelector('#room');
       const floor = document.querySelector('#floor');
       const blackOut = document.querySelector('#black-out');
       const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
       const mysteryText = document.querySelector('#mystery-text');
+      
+      // Cacher l'écran Chanel
+      chanelScreen.setAttribute('visible', 'false');
       
       // Réafficher les éléments UI
       document.getElementById('debug').style.display = 'block';
@@ -549,8 +540,7 @@
       updateDebug('─────────────────');
       updateDebug('🔄 Simulation relancée');
       
-      // Remettre scène A, cacher B et C
-      sceneC.setAttribute('visible', 'false');
+      // Remettre scène A, cacher B
       sceneB.setAttribute('visible', 'false');
       sceneA.setAttribute('visible', 'true');
       
@@ -1066,7 +1056,7 @@
             
             updateDebug('🔑 Lévitation activée');
             
-            // ====== TRANSITION VERS ÉCRAN FINAL CHANEL (SCÈNE C) ======
+            // ====== TRANSITION VERS ÉCRAN FINAL CHANEL (fixé à la caméra) ======
             setTimeout(() => {
               updateDebug('✨ The Golden Key...');
               
@@ -1081,14 +1071,16 @@
                 easing: 'easeInOutQuad'
               });
               
-              // Afficher la scène finale Chanel
+              // Afficher l'écran Chanel fixé à la caméra
               setTimeout(() => {
-                // Cacher scène B, afficher scène C
+                // Cacher scène B
                 sceneB.setAttribute('visible', 'false');
-                const sceneC = document.querySelector('#scene-c');
-                sceneC.setAttribute('visible', 'true');
                 
-                // Changer le fond en blanc
+                // Afficher l'écran Chanel (fixé à la caméra)
+                const chanelScreen = document.querySelector('#chanel-screen');
+                chanelScreen.setAttribute('visible', 'true');
+                
+                // Changer le fond en blanc (pour l'ambiance)
                 room.setAttribute('material', {
                   color: '#FFFFFF',
                   shader: 'flat',
@@ -1098,9 +1090,6 @@
                   color: '#FFFFFF',
                   shader: 'flat'
                 });
-                
-                // Repositionner le joueur face à l'écran
-                document.querySelector('#rig').object3D.position.set(0, 0, 0);
                 
                 // Cacher les éléments UI HTML
                 document.getElementById('debug').style.display = 'none';
