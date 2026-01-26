@@ -681,6 +681,14 @@
           // Retirer la classe clickable
           if (pistolHitbox) pistolHitbox.classList.remove('clickable');
           
+          // Jouer le son du pistolet immédiatement
+          if (gunSound) {
+            gunSound.volume = 0.8;
+            gunSound.play().then(() => {
+              updateDebug('💥 BANG !');
+            }).catch(err => console.warn('Audio pistolet bloqué:', err));
+          }
+          
           // Intensifier la lumière
           if (pistolLight) {
             pistolLight.setAttribute('animation__glow', {
@@ -731,16 +739,8 @@
             
             updateDebug('🔫 Lévitation activée');
             
-            // ====== SON DU PISTOLET + RETOUR SCÈNE A ======
+            // ====== FLASH ET RETOUR SCÈNE A ======
             setTimeout(() => {
-              // Jouer le son du pistolet
-              if (gunSound) {
-                gunSound.volume = 0.8;
-                gunSound.play().then(() => {
-                  updateDebug('💥 BANG !');
-                }).catch(err => console.warn('Audio pistolet bloqué:', err));
-              }
-              
               // Flash blanc
               blackOut.setAttribute('material', 'color', '#FFFFFF');
               blackOut.setAttribute('visible', 'true');
