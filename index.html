@@ -124,6 +124,10 @@
     <source src="./assets/song/You Never Can Tell.mp3" type="audio/mpeg">
   </audio>
 
+  <audio id="gun-sound" preload="auto">
+    <source src="./assets/song/gun-sound.mp3" type="audio/mpeg">
+  </audio>
+
   <a-scene vr-mode-ui="enabled: true">
 
     <a-assets>
@@ -313,7 +317,7 @@
           material="color: #1a1a1a; metalness: 0.9; roughness: 0.1"></a-cylinder>
         
         <!-- Mallette -->
-        <a-entity id ="mallette" gltf-model="#valise-model" position="0 0.61 0" rotation="0 125 0" scale="0.35 0.35 0.35"></a-entity>
+        <a-entity id="mallette" gltf-model="#valise-model" position="0 0.61 0" rotation="0 125 0" scale="0.35 0.35 0.35"></a-entity>
         
         <!-- Lumière mallette -->
         <a-light type="point" intensity="6" color="#FFD700" position="0 0.9 0" distance="3"
@@ -328,11 +332,11 @@
                   rotation="90 -215.700 0"
                   scale="0.08 0.08 0.08">
         </a-entity>
-        <!-- Hitbox GRANDE -->
+        <!-- Hitbox TRÈS GRANDE pour clic facile -->
         <a-box id="pistol-hitbox" 
                class="clickable" 
-               position="0 0.1 0" 
-               width="0.7" height="0.5" depth="0.7"
+               position="0 0.2 0.1" 
+               width="1.0" height="0.8" depth="1.0"
                material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="pistol-light" type="point" intensity="0.3" distance="1" color="#FF4444" position="0 0.05 0"></a-light>
       </a-entity>
@@ -348,10 +352,10 @@
           material="color: #1a1a1a; metalness: 0.9; roughness: 0.1"></a-cylinder>
         
         <!-- Mallette -->
-        <a-entity id="mallette" gltf-model="#valise-model" position="0 0.61 0" rotation="0 100 0" scale="0.35 0.35 0.35"></a-entity>
+        <a-entity id="mallette2" gltf-model="#valise-model" position="0 0.61 0" rotation="0 100 0" scale="0.35 0.35 0.35"></a-entity>
         
         <!-- Lumière mallette -->
-        <a-light type="point" intensity="6" color="#FFFFF" position="0 0.9 0" distance="3"
+        <a-light type="point" intensity="6" color="#FFFFFF" position="0 0.9 0" distance="3"
           animation__pulse2="property: intensity; from: 4; to: 8; dur: 2500; dir: alternate; loop: true; easing: easeInOutSine"></a-light>
       </a-entity>
 
@@ -363,11 +367,11 @@
                   rotation="90 0 0"
                   scale="0.0005 0.0005 0.0005">
         </a-entity>
-        <!-- Hitbox GRANDE -->
+        <!-- Hitbox TRÈS GRANDE pour clic facile -->
         <a-box id="key-hitbox" 
                class="clickable" 
-               position="0 0.1 0" 
-               width="0.7" height="0.5" depth="0.7"
+               position="0 0.2 0.1" 
+               width="1.0" height="0.8" depth="1.0"
                material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="key-light" type="point" intensity="0.5" distance="1.5" color="#FFD700" position="0 0.05 0"></a-light>
       </a-entity>
@@ -396,7 +400,7 @@
       <!-- Texte mystère -->
       <a-text id="mystery-text" value="Choose your way" position="0 2.5 -1.5" align="center" color="#FFD700"
         scale="0.6 0.6 0.6" opacity="0"
-        animation__float="property: position; from: 0 2.8 -1.5; to: 0 2.85 -1.5; dur: 2000; dir: alternate; loop: true">
+        animation__float="property: position; from: 0 2.5 -1.5; to: 0 2.55 -1.5; dur: 2000; dir: alternate; loop: true">
       </a-text>
 
       <!-- Particules dorées -->
@@ -413,11 +417,74 @@
 
     </a-entity>
 
+    <!-- ========== SCÈNE C : ÉCRAN FINAL CHANEL ========== -->
+    <a-entity id="scene-c" visible="false">
+      
+      <!-- Fond blanc -->
+      <a-box position="0 2 -3" width="8" height="6" depth="0.1" 
+             material="color: #FFFFFF; shader: flat"></a-box>
+      
+      <!-- Logo CHANEL -->
+      <a-text id="chanel-logo" 
+              value="CHANEL" 
+              position="0 2.5 -2.9" 
+              align="center" 
+              color="#000000"
+              font="mozillavr"
+              scale="1.5 1.5 1.5"
+              width="4">
+      </a-text>
+      
+      <!-- Sous-titre -->
+      <a-text id="chanel-subtitle" 
+              value="The Golden Key" 
+              position="0 1.8 -2.9" 
+              align="center" 
+              color="#666666"
+              scale="0.6 0.6 0.6"
+              width="4">
+      </a-text>
+      
+      <!-- Bouton Recommencer -->
+      <a-entity id="restart-button" position="0 1 -2.9">
+        <!-- Fond du bouton -->
+        <a-box id="restart-btn-bg" 
+               class="clickable"
+               width="1.8" height="0.4" depth="0.05"
+               material="color: #000000; shader: flat">
+        </a-box>
+        <!-- Texte du bouton -->
+        <a-text value="RECOMMENCER" 
+                position="0 0 0.03" 
+                align="center" 
+                color="#FFFFFF"
+                scale="0.5 0.5 0.5"
+                width="3">
+        </a-text>
+        <!-- Hitbox pour le clic -->
+        <a-box id="restart-hitbox"
+               class="clickable"
+               position="0 0 0.1"
+               width="2" height="0.6" depth="0.3"
+               material="opacity: 0.001; transparent: true"></a-box>
+      </a-entity>
+      
+      <!-- Lumière pour la scène finale -->
+      <a-light type="ambient" color="#FFFFFF" intensity="1"></a-light>
+      
+    </a-entity>
+
   </a-scene>
 
   <script>
     const music = document.getElementById('twist-music');
+    const gunSound = document.getElementById('gun-sound');
     const musicVolume = 0.3;
+    
+    // Variables d'état globales pour permettre le reset
+    let globalTransitionDone = false;
+    let globalPistolActivated = false;
+    let globalKeyActivated = false;
 
     function fadeOutMusic(duration = 1500) {
       console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
@@ -458,6 +525,127 @@
         updateDebug('⚠️ Audio bloqué');
       });
     });
+
+    // Fonction de reset complète (utilisée par le bouton VR)
+    function resetExperience() {
+      const sceneA = document.querySelector('#scene-a');
+      const sceneB = document.querySelector('#scene-b');
+      const sceneC = document.querySelector('#scene-c');
+      const room = document.querySelector('#room');
+      const floor = document.querySelector('#floor');
+      const blackOut = document.querySelector('#black-out');
+      const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
+      const mysteryText = document.querySelector('#mystery-text');
+      
+      // Réafficher les éléments UI
+      document.getElementById('debug').style.display = 'block';
+      document.getElementById('instructions').style.display = 'block';
+      document.getElementById('title').style.display = 'block';
+      document.getElementById('instructions').innerHTML = 'Cliquez sur le $5 Shake';
+      
+      // Réinitialiser le debug
+      document.getElementById('debug').innerHTML = 'Initialisation...';
+      updateDebug('🎬 Chanel x Pulp Fiction');
+      updateDebug('─────────────────');
+      updateDebug('🔄 Simulation relancée');
+      
+      // Remettre scène A, cacher B et C
+      sceneC.setAttribute('visible', 'false');
+      sceneB.setAttribute('visible', 'false');
+      sceneA.setAttribute('visible', 'true');
+      
+      // Réinitialiser les murs et sol
+      room.setAttribute('material', {
+        color: '#1a0a0a',
+        metalness: 0.3,
+        roughness: 0.7,
+        side: 'back'
+      });
+      
+      floor.setAttribute('material', {
+        color: '#111',
+        metalness: 0.5,
+        roughness: 0.5
+      });
+      
+      // Repositionner le joueur
+      document.querySelector('#rig').object3D.position.set(0, 0, 0);
+      
+      // Réactiver la hitbox du milkshake
+      milkshakeHitbox.classList.add('clickable');
+      
+      // Réinitialiser le pistolet
+      const pistolContainer = document.querySelector('#pistol-container');
+      const pistolModel = document.querySelector('#pistol-model-b');
+      const pistolHitbox = document.querySelector('#pistol-hitbox');
+      const pistolLight = document.querySelector('#pistol-light');
+      
+      if (pistolContainer) {
+        pistolContainer.removeAttribute('animation__levitate');
+        pistolContainer.removeAttribute('animation__float');
+        pistolContainer.setAttribute('position', '-0.6 0.6 -0.8');
+      }
+      if (pistolModel) {
+        pistolModel.removeAttribute('animation__straighten');
+        pistolModel.removeAttribute('animation__spin');
+        pistolModel.setAttribute('rotation', '90 -215.700 0');
+      }
+      if (pistolHitbox) {
+        pistolHitbox.classList.add('clickable');
+        pistolHitbox.setAttribute('position', '0 0.2 0.1');
+      }
+      if (pistolLight) {
+        pistolLight.removeAttribute('animation__glow');
+        pistolLight.setAttribute('intensity', '0.3');
+      }
+      
+      // Réinitialiser la clé
+      const keyContainer = document.querySelector('#key-container');
+      const keyModel = document.querySelector('#key-model');
+      const keyHitbox = document.querySelector('#key-hitbox');
+      const keyLight = document.querySelector('#key-light');
+      
+      if (keyContainer) {
+        keyContainer.removeAttribute('animation__levitate');
+        keyContainer.removeAttribute('animation__float');
+        keyContainer.setAttribute('position', '0.7 0.6 -0.8');
+      }
+      if (keyModel) {
+        keyModel.removeAttribute('animation__straighten');
+        keyModel.removeAttribute('animation__spin');
+        keyModel.setAttribute('rotation', '90 0 0');
+      }
+      if (keyHitbox) {
+        keyHitbox.classList.add('clickable');
+        keyHitbox.setAttribute('position', '0 0.2 0.1');
+      }
+      if (keyLight) {
+        keyLight.removeAttribute('animation__glow');
+        keyLight.setAttribute('intensity', '0.5');
+      }
+      
+      // Réinitialiser le texte mystère
+      mysteryText.removeAttribute('animation__appear');
+      mysteryText.setAttribute('opacity', '0');
+      
+      // Réinitialiser le blackout
+      blackOut.setAttribute('material', 'color', '#000000');
+      blackOut.setAttribute('material', 'opacity', '0');
+      blackOut.setAttribute('visible', 'false');
+      
+      // Réinitialiser les états globaux
+      globalTransitionDone = false;
+      globalPistolActivated = false;
+      globalKeyActivated = false;
+      
+      // Relancer la musique
+      music.volume = musicVolume;
+      music.currentTime = 0;
+      music.play().catch(e => console.warn('Audio:', e));
+      
+      updateDebug('🎵 ♪ You Never Can Tell ♪');
+      updateDebug('👆 Pointez le shake');
+    }
 
     AFRAME.registerComponent('vr-click-handler', {
       init: function () {
@@ -533,13 +721,9 @@
         const mysteryText = document.querySelector('#mystery-text');
         const vrHelp = document.querySelector('#vr-help');
 
-        let transitionDone = false;
-        let pistolActivated = false;
-        let keyActivated = false;
-
         function transitionToSceneB() {
-          if (transitionDone) return;
-          transitionDone = true;
+          if (globalTransitionDone) return;
+          globalTransitionDone = true;
           updateDebug('🎞️ CUT !');
 
           console.log('🎵 État musique avant fondu - paused:', music.paused, 'volume:', music.volume);
@@ -597,8 +781,8 @@
 
         // ====== PISTOLET INTERACTIF - SCÈNE B ======
         function activatePistol() {
-          if (pistolActivated) return;
-          pistolActivated = true;
+          if (globalPistolActivated) return;
+          globalPistolActivated = true;
           
           updateDebug('🔫 Pistolet activé !');
           
@@ -664,13 +848,158 @@
             });
             
             updateDebug('🔫 Lévitation activée');
+            
+            // ====== SON DU PISTOLET + RETOUR SCÈNE A ======
+            setTimeout(() => {
+              // Jouer le son du pistolet
+              if (gunSound) {
+                gunSound.volume = 0.8;
+                gunSound.play().then(() => {
+                  updateDebug('💥 BANG !');
+                }).catch(err => console.warn('Audio pistolet bloqué:', err));
+              }
+              
+              // Flash blanc
+              blackOut.setAttribute('material', 'color', '#FFFFFF');
+              blackOut.setAttribute('visible', 'true');
+              blackOut.setAttribute('animation__flash', {
+                property: 'material.opacity',
+                from: 0,
+                to: 1,
+                dur: 100,
+                easing: 'easeInQuad'
+              });
+              
+              // Transition retour vers scène A
+              setTimeout(() => {
+                // Fondu au noir
+                blackOut.setAttribute('material', 'color', '#000000');
+                blackOut.setAttribute('animation__fadeBlack', {
+                  property: 'material.opacity',
+                  from: 1,
+                  to: 1,
+                  dur: 500
+                });
+                
+                setTimeout(() => {
+                  // Remettre scène A
+                  sceneB.setAttribute('visible', 'false');
+                  sceneA.setAttribute('visible', 'true');
+                  
+                  // Réinitialiser les murs et sol
+                  room.setAttribute('material', {
+                    color: '#1a0a0a',
+                    metalness: 0.3,
+                    roughness: 0.7,
+                    side: 'back'
+                  });
+                  
+                  floor.setAttribute('material', {
+                    color: '#111',
+                    metalness: 0.5,
+                    roughness: 0.5
+                  });
+                  
+                  // Repositionner le joueur
+                  document.querySelector('#rig').object3D.position.set(0, 0, 0);
+                  
+                  // ====== RÉINITIALISER TOUS LES ÉTATS ======
+                  globalTransitionDone = false;
+                  globalPistolActivated = false;
+                  globalKeyActivated = false;
+                  
+                  // Réactiver la hitbox du milkshake
+                  milkshakeHitbox.classList.add('clickable');
+                  
+                  // Réinitialiser le pistolet (position et rotation)
+                  const pistolContainerReset = document.querySelector('#pistol-container');
+                  const pistolModelReset = document.querySelector('#pistol-model-b');
+                  const pistolHitboxReset = document.querySelector('#pistol-hitbox');
+                  const pistolLightReset = document.querySelector('#pistol-light');
+                  
+                  if (pistolContainerReset) {
+                    pistolContainerReset.removeAttribute('animation__levitate');
+                    pistolContainerReset.removeAttribute('animation__float');
+                    pistolContainerReset.setAttribute('position', '-0.6 0.6 -0.8');
+                  }
+                  if (pistolModelReset) {
+                    pistolModelReset.removeAttribute('animation__straighten');
+                    pistolModelReset.removeAttribute('animation__spin');
+                    pistolModelReset.setAttribute('rotation', '90 -215.700 0');
+                  }
+                  if (pistolHitboxReset) {
+                    pistolHitboxReset.classList.add('clickable');
+                    pistolHitboxReset.setAttribute('position', '0 0.2 0.1');
+                  }
+                  if (pistolLightReset) {
+                    pistolLightReset.removeAttribute('animation__glow');
+                    pistolLightReset.setAttribute('intensity', '0.3');
+                  }
+                  
+                  // Réinitialiser la clé (position et rotation)
+                  const keyContainerReset = document.querySelector('#key-container');
+                  const keyModelReset = document.querySelector('#key-model');
+                  const keyHitboxReset = document.querySelector('#key-hitbox');
+                  const keyLightReset = document.querySelector('#key-light');
+                  
+                  if (keyContainerReset) {
+                    keyContainerReset.removeAttribute('animation__levitate');
+                    keyContainerReset.removeAttribute('animation__float');
+                    keyContainerReset.setAttribute('position', '0.7 0.6 -0.8');
+                  }
+                  if (keyModelReset) {
+                    keyModelReset.removeAttribute('animation__straighten');
+                    keyModelReset.removeAttribute('animation__spin');
+                    keyModelReset.setAttribute('rotation', '90 0 0');
+                  }
+                  if (keyHitboxReset) {
+                    keyHitboxReset.classList.add('clickable');
+                    keyHitboxReset.setAttribute('position', '0 0.2 0.1');
+                  }
+                  if (keyLightReset) {
+                    keyLightReset.removeAttribute('animation__glow');
+                    keyLightReset.setAttribute('intensity', '0.5');
+                  }
+                  
+                  // Réinitialiser le texte mystère
+                  mysteryText.removeAttribute('animation__appear');
+                  mysteryText.setAttribute('opacity', '0');
+                  
+                  // Relancer la musique
+                  music.volume = musicVolume;
+                  music.currentTime = 0;
+                  music.play().catch(e => console.warn('Audio:', e));
+                  
+                  updateDebug('🎵 Retour Jack Rabbit Slim\'s');
+                  if (instructions) instructions.innerHTML = 'Cliquez sur le $5 Shake';
+                  
+                  // Fondu sortie
+                  setTimeout(() => {
+                    blackOut.setAttribute('animation__fadeOut2', {
+                      property: 'material.opacity',
+                      from: 1,
+                      to: 0,
+                      dur: 1500,
+                      easing: 'easeOutCubic'
+                    });
+                    
+                    setTimeout(() => {
+                      blackOut.setAttribute('visible', 'false');
+                      updateDebug('✅ Expérience réinitialisée');
+                      updateDebug('👆 Pointez le shake');
+                    }, 1600);
+                  }, 200);
+                }, 800);
+              }, 300);
+            }, 2500); // Délai après le début de la rotation
+            
           }, 1500);
         }
 
         // ====== CLÉ DORÉE INTERACTIVE - SCÈNE B ======
         function activateKey() {
-          if (keyActivated) return;
-          keyActivated = true;
+          if (globalKeyActivated) return;
+          globalKeyActivated = true;
           
           updateDebug('🔑 Clé activée !');
           
@@ -736,6 +1065,66 @@
             });
             
             updateDebug('🔑 Lévitation activée');
+            
+            // ====== TRANSITION VERS ÉCRAN FINAL CHANEL (SCÈNE C) ======
+            setTimeout(() => {
+              updateDebug('✨ The Golden Key...');
+              
+              // Fondu au blanc
+              blackOut.setAttribute('material', 'color', '#FFFFFF');
+              blackOut.setAttribute('visible', 'true');
+              blackOut.setAttribute('animation__fadeWhite', {
+                property: 'material.opacity',
+                from: 0,
+                to: 1,
+                dur: 2000,
+                easing: 'easeInOutQuad'
+              });
+              
+              // Afficher la scène finale Chanel
+              setTimeout(() => {
+                // Cacher scène B, afficher scène C
+                sceneB.setAttribute('visible', 'false');
+                const sceneC = document.querySelector('#scene-c');
+                sceneC.setAttribute('visible', 'true');
+                
+                // Changer le fond en blanc
+                room.setAttribute('material', {
+                  color: '#FFFFFF',
+                  shader: 'flat',
+                  side: 'back'
+                });
+                floor.setAttribute('material', {
+                  color: '#FFFFFF',
+                  shader: 'flat'
+                });
+                
+                // Repositionner le joueur face à l'écran
+                document.querySelector('#rig').object3D.position.set(0, 0, 0);
+                
+                // Cacher les éléments UI HTML
+                document.getElementById('debug').style.display = 'none';
+                document.getElementById('instructions').style.display = 'none';
+                document.getElementById('title').style.display = 'none';
+                
+                // Fondu sortie du blanc
+                setTimeout(() => {
+                  blackOut.setAttribute('animation__fadeOutWhite', {
+                    property: 'material.opacity',
+                    from: 1,
+                    to: 0,
+                    dur: 1500,
+                    easing: 'easeOutCubic'
+                  });
+                  
+                  setTimeout(() => {
+                    blackOut.setAttribute('visible', 'false');
+                    updateDebug('🏆 Fin - Écran Chanel VR');
+                  }, 1600);
+                }, 300);
+              }, 2000);
+            }, 2500); // Délai après le début de la rotation
+            
           }, 1500);
         }
 
@@ -757,6 +1146,15 @@
           });
         }
 
+        // Clic sur le bouton restart (scène C)
+        const restartHitbox = document.querySelector('#restart-hitbox');
+        if (restartHitbox) {
+          restartHitbox.addEventListener('click', () => {
+            updateDebug('🔄 Restart cliqué');
+            resetExperience();
+          });
+        }
+
         // Milkshake click
         milkshakeHitbox.addEventListener('click', () => {
           updateDebug('🥤 Click direct hitbox');
@@ -768,18 +1166,23 @@
             const intersectedEl = evt.detail?.intersectedEl;
             
             // Vérifier milkshake
-            if (!transitionDone && intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
+            if (!globalTransitionDone && intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
               transitionToSceneB();
             }
             
             // Vérifier pistolet
-            if (!pistolActivated && intersectedEl && intersectedEl.id === 'pistol-hitbox') {
+            if (!globalPistolActivated && intersectedEl && intersectedEl.id === 'pistol-hitbox') {
               activatePistol();
             }
             
             // Vérifier clé
-            if (!keyActivated && intersectedEl && intersectedEl.id === 'key-hitbox') {
+            if (!globalKeyActivated && intersectedEl && intersectedEl.id === 'key-hitbox') {
               activateKey();
+            }
+            
+            // Vérifier bouton restart
+            if (intersectedEl && intersectedEl.id === 'restart-hitbox') {
+              resetExperience();
             }
           });
         }
@@ -793,16 +1196,21 @@
             if (intersections && intersections.length > 0) {
               const hit = intersections[0].object.el;
               
-              if (!transitionDone && hit && hit.id === 'milkshake-hitbox') {
+              if (!globalTransitionDone && hit && hit.id === 'milkshake-hitbox') {
                 transitionToSceneB();
               }
               
-              if (!pistolActivated && hit && hit.id === 'pistol-hitbox') {
+              if (!globalPistolActivated && hit && hit.id === 'pistol-hitbox') {
                 activatePistol();
               }
               
-              if (!keyActivated && hit && hit.id === 'key-hitbox') {
+              if (!globalKeyActivated && hit && hit.id === 'key-hitbox') {
                 activateKey();
+              }
+              
+              // Bouton restart
+              if (hit && hit.id === 'restart-hitbox') {
+                resetExperience();
               }
             }
           }
