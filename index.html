@@ -160,20 +160,20 @@
         </a-plane>
 
         <!-- ========== ÉCRAN FINAL CHANEL (fixé à la caméra) ========== -->
-        <a-entity id="chanel-screen" visible="false" position="0 0 -2">
+        <a-entity id="chanel-screen" visible="false" position="0 0 -0.8">
           
           <!-- Fond blanc -->
-          <a-plane width="4" height="3" 
+          <a-plane width="2" height="1.5" 
                    material="color: #FFFFFF; shader: flat">
           </a-plane>
           
           <!-- Logo CHANEL -->
           <a-text id="chanel-logo" 
                   value="CHANEL" 
-                  position="0 0.5 0.01" 
+                  position="0 0.25 0.01" 
                   align="center" 
                   color="#000000"
-                  scale="1.2 1.2 1.2"
+                  scale="0.6 0.6 0.6"
                   width="4">
           </a-text>
           
@@ -183,15 +183,15 @@
                   position="0 0 0.01" 
                   align="center" 
                   color="#666666"
-                  scale="0.5 0.5 0.5"
+                  scale="0.25 0.25 0.25"
                   width="4">
           </a-text>
           
           <!-- Bouton Recommencer -->
-          <a-entity id="restart-button" position="0 -0.6 0.01">
+          <a-entity id="restart-button" position="0 -0.3 0.01">
             <!-- Fond du bouton -->
             <a-plane id="restart-btn-bg" 
-                     width="1.2" height="0.25"
+                     width="0.6" height="0.15"
                      material="color: #000000; shader: flat">
             </a-plane>
             <!-- Texte du bouton -->
@@ -199,14 +199,14 @@
                     position="0 0 0.01" 
                     align="center" 
                     color="#FFFFFF"
-                    scale="0.4 0.4 0.4"
+                    scale="0.2 0.2 0.2"
                     width="3">
             </a-text>
             <!-- Hitbox pour le clic -->
             <a-box id="restart-hitbox"
                    class="clickable"
                    position="0 0 0.05"
-                   width="1.4" height="0.4" depth="0.2"
+                   width="0.7" height="0.25" depth="0.1"
                    material="opacity: 0.001; transparent: true; side: double"></a-box>
           </a-entity>
           
@@ -414,11 +414,11 @@
       </a-entity>
 
       <!-- CLÉ DORÉE INTERACTIVE (mallette 2) -->
-      <a-entity id="key-container" position="0.7 0.6 -0.8">
+      <a-entity id="key-container" position="0.6 0.65 -0.8">
         <a-entity id="key-model" 
                   gltf-model="#golden-key-model" 
-                  position="0 0 0" 
-                  rotation="90 0 0"
+                  position="0.1 -0.1 0" 
+                  rotation="0 0 0"
                   scale="0.0005 0.0005 0.0005">
         </a-entity>
         <!-- Hitbox TRÈS GRANDE pour clic facile -->
@@ -640,6 +640,9 @@
             });
 
             document.querySelector('#rig').object3D.position.set(0, 0, 1.2);
+            
+            // Faire tourner le rig de 180° pour faire face aux mallettes
+            document.querySelector('#rig').object3D.rotation.y = Math.PI; // 180° en radians
 
             setTimeout(() => {
               blackOut.setAttribute('animation__fadeOut', {
@@ -680,14 +683,6 @@
           
           // Retirer la classe clickable
           if (pistolHitbox) pistolHitbox.classList.remove('clickable');
-          
-          // Jouer le son du pistolet immédiatement
-          if (gunSound) {
-            gunSound.volume = 0.8;
-            gunSound.play().then(() => {
-              updateDebug('💥 BANG !');
-            }).catch(err => console.warn('Audio pistolet bloqué:', err));
-          }
           
           // Intensifier la lumière
           if (pistolLight) {
@@ -739,8 +734,16 @@
             
             updateDebug('🔫 Lévitation activée');
             
-            // ====== FLASH ET RETOUR SCÈNE A ======
+            // ====== SON DU PISTOLET + RETOUR SCÈNE A ======
             setTimeout(() => {
+              // Jouer le son du pistolet
+              if (gunSound) {
+                gunSound.volume = 0.8;
+                gunSound.play().then(() => {
+                  updateDebug('💥 BANG !');
+                }).catch(err => console.warn('Audio pistolet bloqué:', err));
+              }
+              
               // Flash blanc
               blackOut.setAttribute('material', 'color', '#FFFFFF');
               blackOut.setAttribute('visible', 'true');
@@ -782,8 +785,9 @@
                     roughness: 0.5
                   });
                   
-                  // Repositionner le joueur
+                  // Repositionner le joueur et réinitialiser sa rotation
                   document.querySelector('#rig').object3D.position.set(0, 0, 0);
+                  document.querySelector('#rig').object3D.rotation.y = 0;
                   
                   // ====== RÉINITIALISER TOUS LES ÉTATS ======
                   globalTransitionDone = false;
@@ -827,12 +831,13 @@
                   if (keyContainerReset) {
                     keyContainerReset.removeAttribute('animation__levitate');
                     keyContainerReset.removeAttribute('animation__float');
-                    keyContainerReset.setAttribute('position', '0.7 0.6 -0.8');
+                    keyContainerReset.setAttribute('position', '0.6 0.65 -0.8');
                   }
                   if (keyModelReset) {
                     keyModelReset.removeAttribute('animation__straighten');
                     keyModelReset.removeAttribute('animation__spin');
-                    keyModelReset.setAttribute('rotation', '90 0 0');
+                    keyModelReset.setAttribute('position', '0.1 -0.1 0');
+                    keyModelReset.setAttribute('rotation', '0 0 0');
                   }
                   if (keyHitboxReset) {
                     keyHitboxReset.classList.add('clickable');
@@ -916,7 +921,7 @@
             easing: 'easeOutCubic'
           });
           
-          // Animation de redressement (le modèle se redresse)
+          // Animation de redressement (la clé se met debout - de Z:90 à Z:0)
           keyModel.setAttribute('animation__straighten', {
             property: 'rotation',
             to: '0 0 0',
@@ -924,12 +929,12 @@
             easing: 'easeOutBack'
           });
           
-          // Animation de rotation infinie (après le redressement)
+          // Animation de rotation infinie sur l'axe X (après le redressement)
           setTimeout(() => {
             keyModel.setAttribute('animation__spin', {
               property: 'rotation',
               from: '0 0 0',
-              to: '0 360 0',
+              to: '360 0 0',
               dur: 4000,
               loop: true,
               easing: 'linear'
