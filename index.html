@@ -149,7 +149,7 @@
       constrain-position="min: -1.7 0 -1.7; max: 1.7 0 1.7">
 
       <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
-        <a-entity id="desktop-cursor" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable; far: 20">
+        <a-entity id="desktop-cursor" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable; far: 10">
         </a-entity>
 
         <a-plane id="black-out" position="0 0 -0.3" width="6" height="6"
@@ -163,7 +163,6 @@
           <a-plane width="2" height="1.5" 
                    material="color: #FFFFFF; shader: flat">
           </a-plane>
-          
           
           <!-- Logo CHANEL -->
           <a-text id="chanel-logo" 
@@ -204,7 +203,7 @@
             <a-box id="restart-hitbox"
                    class="clickable"
                    position="0 0 0.05"
-                   width="0.6" height="0.15" depth="0.1"
+                   width="0.7" height="0.25" depth="0.1"
                    material="opacity: 0.001; transparent: true; side: double"></a-box>
           </a-entity>
           
@@ -213,11 +212,11 @@
       </a-camera>
 
       <a-entity id="left-hand" laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
-        raycaster="objects: .clickable; far: 20; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
+        raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
       </a-entity>
 
       <a-entity id="right-hand" laser-controls="hand: right; model: true; defaultModelColor: #FFD700"
-        raycaster="objects: .clickable; far: 20; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
+        raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
       </a-entity>
 
     </a-entity>
@@ -313,7 +312,7 @@
       </a-entity>
 
       <!-- HITBOX -->
-      <a-box id="milkshake-hitbox" class="clickable" position="0 0.85 1.2" width="0.25" height="0.4" depth="0.25"
+      <a-box id="milkshake-hitbox" class="clickable" position="0 0.85 1.2" width="0.3" height="0.5" depth="0.3"
         material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
 
       <!-- NÉONS PLAFOND -->
@@ -394,7 +393,7 @@
         <a-box id="pistol-hitbox" 
                class="clickable" 
                position="0 0.05 0" 
-               width="0.2" height="0.2" depth="0.15"
+               width="0.35" height="0.25" depth="0.2"
                material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="pistol-light" type="point" intensity="0.3" distance="1" color="#FF4444" position="0 0.05 0"></a-light>
       </a-entity>
@@ -429,7 +428,7 @@
         <a-box id="key-hitbox" 
                class="clickable" 
                position="0.1 -0.05 0" 
-               width="0.2" height="0.15" depth="0.1"
+               width="0.3" height="0.2" depth="0.15"
                material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="key-light" type="point" intensity="0.5" distance="1.5" color="#FFD700" position="0 0.05 0"></a-light>
       </a-entity>
@@ -552,38 +551,28 @@
     AFRAME.registerComponent('vr-click-handler', {
       init: function () {
         const el = this.el;
+        el.addEventListener('triggerdown', this.onClick.bind(this));
+        el.addEventListener('selectstart', this.onClick.bind(this));
         el.addEventListener('raycaster-intersection', (evt) => {
-          const intersections = evt.detail.intersections;
-          if (intersections && intersections.length > 0) {
-            for (let i = 0; i < intersections.length; i++) {
-              const target = intersections[i].object.el;
-              if (target && target.classList.contains('clickable')) {
-                // Changer la couleur du laser quand on pointe un objet cliquable
-                el.setAttribute('raycaster', 'lineColor', '#00FF00');
-                return;
-              }
-            }
+          const target = evt.detail.els[0];
+          if (target && target.classList.contains('clickable')) {
+            el.setAttribute('raycaster', 'lineColor', '#00FF00');
           }
-          el.setAttribute('raycaster', 'lineColor', '#FFD700');
         });
-        
         el.addEventListener('raycaster-intersection-cleared', () => {
           el.setAttribute('raycaster', 'lineColor', '#FFD700');
         });
-
-        // Gestion des clics VR
-        el.addEventListener('triggerdown', () => {
-          const raycaster = el.components.raycaster;
-          if (!raycaster) return;
-          
-          const intersections = raycaster.intersections;
-          if (intersections && intersections.length > 0) {
-            const target = intersections[0].object.el;
-            if (target && target.classList.contains('clickable')) {
-              handleClickEvent(target.id);
-            }
+      },
+      onClick: function () {
+        const raycaster = this.el.components.raycaster;
+        if (!raycaster) return;
+        const intersections = raycaster.intersections;
+        if (intersections.length > 0) {
+          const target = intersections[0].object.el;
+          if (target && target.classList.contains('clickable')) {
+            target.emit('click');
           }
-        });
+        }
       }
     });
 
@@ -608,27 +597,6 @@
       const d = document.getElementById('debug');
       if (d) { d.innerHTML += `<br>${msg}`; d.scrollTop = d.scrollHeight; }
       console.log(msg);
-    }
-
-    // ====== SYSTÈME D'INTERACTION UNIFIÉ ======
-    function handleClickEvent(targetId) {
-      console.log('🖱️ Click sur:', targetId);
-      updateDebug(`👆 ${targetId}`);
-
-      switch(targetId) {
-        case 'milkshake-hitbox':
-          if (!globalTransitionDone) transitionToSceneB();
-          break;
-        case 'pistol-hitbox':
-          if (!globalPistolActivated) activatePistol();
-          break;
-        case 'key-hitbox':
-          if (!globalKeyActivated) activateKey();
-          break;
-        case 'restart-hitbox':
-          resetExperience();
-          break;
-      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1073,22 +1041,89 @@
           }, 1500);
         }
 
-        // ====== DESKTOP: Système de clic unifié ======
+        // Clic sur le pistolet (hitbox)
+        const pistolHitbox = document.querySelector('#pistol-hitbox');
+        if (pistolHitbox) {
+          pistolHitbox.addEventListener('click', () => {
+            updateDebug('🔫 Clic pistolet');
+            activatePistol();
+          });
+        }
+
+        // Clic sur la clé (hitbox)
+        const keyHitbox = document.querySelector('#key-hitbox');
+        if (keyHitbox) {
+          keyHitbox.addEventListener('click', () => {
+            updateDebug('🔑 Clic clé');
+            activateKey();
+          });
+        }
+
+        // Clic sur le bouton restart (scène C)
+        const restartHitbox = document.querySelector('#restart-hitbox');
+        if (restartHitbox) {
+          restartHitbox.addEventListener('click', () => {
+            updateDebug('🔄 Restart cliqué');
+            resetExperience();
+          });
+        }
+
+        // Milkshake click
+        milkshakeHitbox.addEventListener('click', () => {
+          updateDebug('🥤 Click direct hitbox');
+          transitionToSceneB();
+        });
+
+        if (desktopCursor) {
+          desktopCursor.addEventListener('click', (evt) => {
+            const intersectedEl = evt.detail?.intersectedEl;
+            
+            // Vérifier milkshake
+            if (!globalTransitionDone && intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
+              transitionToSceneB();
+            }
+            
+            // Vérifier pistolet
+            if (!globalPistolActivated && intersectedEl && intersectedEl.id === 'pistol-hitbox') {
+              activatePistol();
+            }
+            
+            // Vérifier clé
+            if (!globalKeyActivated && intersectedEl && intersectedEl.id === 'key-hitbox') {
+              activateKey();
+            }
+            
+            // Vérifier bouton restart
+            if (intersectedEl && intersectedEl.id === 'restart-hitbox') {
+              resetExperience();
+            }
+          });
+        }
+
         document.addEventListener('click', (evt) => {
           if (document.getElementById('start-experience').style.display !== 'none') return;
           
           const cam = document.querySelector('#cam');
           if (cam && cam.components.raycaster) {
-            const raycaster = cam.components.raycaster;
-            const intersections = raycaster.intersections;
-            
+            const intersections = cam.components.raycaster.intersections;
             if (intersections && intersections.length > 0) {
-              for (let i = 0; i < intersections.length; i++) {
-                const hit = intersections[i].object.el;
-                if (hit && hit.classList.contains('clickable')) {
-                  handleClickEvent(hit.id);
-                  return; // Important: arrêter après le premier clic
-                }
+              const hit = intersections[0].object.el;
+              
+              if (!globalTransitionDone && hit && hit.id === 'milkshake-hitbox') {
+                transitionToSceneB();
+              }
+              
+              if (!globalPistolActivated && hit && hit.id === 'pistol-hitbox') {
+                activatePistol();
+              }
+              
+              if (!globalKeyActivated && hit && hit.id === 'key-hitbox') {
+                activateKey();
+              }
+              
+              // Bouton restart
+              if (hit && hit.id === 'restart-hitbox') {
+                resetExperience();
               }
             }
           }
