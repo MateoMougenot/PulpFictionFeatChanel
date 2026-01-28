@@ -336,9 +336,15 @@
       </a-entity>
 
       <!-- NÉONS TEXTE -->
-      <a-entity position="0 2.5 -1.95">
-        <a-text value="JACK RABBIT SLIM'S" align="center" color="#FF1493" scale="0.35 0.35 0.35"></a-text>
-        <a-light type="point" intensity="0.8" distance="3" color="#FF1493" position="0 0 0.1"></a-light>
+      <a-entity position="0 2.8 -1.95">
+        <a-text value="JACK RABBIT SLIM'S" 
+                align="center" 
+                color="#FF1493" 
+                font="mozillavr"
+                scale="1 1 1"
+                width="5">
+        </a-text>
+        <a-light type="point" intensity="1.5" distance="3" color="#FF1493" position="0 0 0.1"></a-light>
       </a-entity>
 
       <!-- PANNEAU VR -->
@@ -468,6 +474,23 @@
         <a-sphere radius="0.009" position="-0.3 0.35 0.2" material="color: #FFD700; opacity: 0.2; transparent: true"
           animation__float4="property: position; to: -0.25 0.55 0.25; dur: 3800; dir: alternate; loop: true"></a-sphere>
       </a-entity>
+
+      
+      <!-- ====== DÉCORATION SCÈNE B ====== -->
+      
+      <!-- Flaque de sang décorative (rappel Pulp Fiction) -->
+      <a-entity gltf-model="#blood-model" position="-1 0.01 -0.5" rotation="0 30 0" scale="0.4 0.4 0.4"></a-entity>
+      
+      <!-- Colonnes décoratives -->
+      <a-cylinder position="-1.8 2 -0.8" radius="0.08" height="4" 
+        material="color: #2a0a0a; metalness: 0.6; roughness: 0.4"></a-cylinder>
+      <a-cylinder position="1.8 2 -0.8" radius="0.08" height="4" 
+        material="color: #2a0a0a; metalness: 0.6; roughness: 0.4"></a-cylinder>
+      
+           
+      <!-- Néon décoratif au plafond -->
+      <a-box position="0 3.9 -0.8" width="2" height="0.05" depth="0.05"
+        material="color: #FF0000; emissive: #FF0000; emissiveIntensity: 0.5; shader: flat"></a-box>
 
     </a-entity>
 
@@ -671,6 +694,14 @@
           
           updateDebug('🔫 Pistolet activé !');
           
+          // SON INSTANTANÉ
+          if (gunSound) {
+            gunSound.volume = 0.8;
+            gunSound.play().then(() => {
+              updateDebug('💥 BANG !');
+            }).catch(err => console.warn('Audio pistolet bloqué:', err));
+          }
+          
           const pistolContainer = document.querySelector('#pistol-container');
           const pistolModel = document.querySelector('#pistol-model-b');
           const pistolLight = document.querySelector('#pistol-light');
@@ -734,16 +765,8 @@
             
             updateDebug('🔫 Lévitation activée');
             
-            // ====== SON DU PISTOLET + RETOUR SCÈNE A ======
+            // ====== RETOUR SCÈNE A ======
             setTimeout(() => {
-              // Jouer le son du pistolet
-              if (gunSound) {
-                gunSound.volume = 0.8;
-                gunSound.play().then(() => {
-                  updateDebug('💥 BANG !');
-                }).catch(err => console.warn('Audio pistolet bloqué:', err));
-              }
-              
               // Flash blanc
               blackOut.setAttribute('material', 'color', '#FFFFFF');
               blackOut.setAttribute('visible', 'true');
@@ -872,13 +895,21 @@
                     
                     setTimeout(() => {
                       blackOut.setAttribute('visible', 'false');
+                      // Nettoyer toutes les animations du blackOut pour le prochain cycle
+                      blackOut.removeAttribute('animation__fadeIn');
+                      blackOut.removeAttribute('animation__fadeOut');
+                      blackOut.removeAttribute('animation__flash');
+                      blackOut.removeAttribute('animation__fadeBlack');
+                      blackOut.removeAttribute('animation__fadeOut2');
+                      blackOut.setAttribute('material', 'color', '#000');
+                      blackOut.setAttribute('material', 'opacity', '0');
                       updateDebug('✅ Expérience réinitialisée');
                       updateDebug('👆 Pointez le shake');
                     }, 1600);
                   }, 200);
                 }, 800);
               }, 300);
-            }, 1000); // Délai réduit - son pistolet plus tôt
+            }, 1000);
             
           }, 1500);
         }
