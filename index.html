@@ -150,9 +150,6 @@
 
       <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
         <a-entity id="desktop-cursor" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable; far: 10">
-          <a-ring position="0 0 -1" radius-inner="0.02" radius-outer="0.03" color="#FFD700" opacity="0.8"
-            animation__scale="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; dir: alternate; loop: true">
-          </a-ring>
         </a-entity>
 
         <a-plane id="black-out" position="0 0 -0.3" width="6" height="6"
@@ -315,7 +312,7 @@
       </a-entity>
 
       <!-- HITBOX -->
-      <a-box id="milkshake-hitbox" class="clickable" position="0 0.9 1.15" width="1.0" height="1.2" depth="1.0"
+      <a-box id="milkshake-hitbox" class="clickable" position="0 0.85 1.2" width="0.3" height="0.5" depth="0.3"
         material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
 
       <!-- NÉONS PLAFOND -->
@@ -336,12 +333,12 @@
       </a-entity>
 
       <!-- NÉONS TEXTE -->
-      <a-entity position="0 2.8 -1.95">
+      <a-entity position="0 2.5 -1.95">
         <a-text value="JACK RABBIT SLIM'S" 
                 align="center" 
                 color="#FF1493" 
                 font="mozillavr"
-                scale="1 1 1"
+                scale="1.2 1.2 1.2"
                 width="5">
         </a-text>
         <a-light type="point" intensity="1.5" distance="3" color="#FF1493" position="0 0 0.1"></a-light>
@@ -392,11 +389,11 @@
                   rotation="90 -215.700 0"
                   scale="0.08 0.08 0.08">
         </a-entity>
-        <!-- Hitbox TRÈS GRANDE pour clic facile -->
+        <!-- Hitbox ajustée au pistolet -->
         <a-box id="pistol-hitbox" 
                class="clickable" 
-               position="0 0.2 0.1" 
-               width="1.0" height="0.8" depth="1.0"
+               position="0 0.05 0" 
+               width="0.35" height="0.25" depth="0.2"
                material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="pistol-light" type="point" intensity="0.3" distance="1" color="#FF4444" position="0 0.05 0"></a-light>
       </a-entity>
@@ -427,11 +424,11 @@
                   rotation="0 0 0"
                   scale="0.0005 0.0005 0.0005">
         </a-entity>
-        <!-- Hitbox TRÈS GRANDE pour clic facile -->
+        <!-- Hitbox ajustée à la clé -->
         <a-box id="key-hitbox" 
                class="clickable" 
-               position="0 0.2 0.1" 
-               width="1.0" height="0.8" depth="1.0"
+               position="0.1 -0.05 0" 
+               width="0.3" height="0.2" depth="0.15"
                material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="key-light" type="point" intensity="0.5" distance="1.5" color="#FFD700" position="0 0.05 0"></a-light>
       </a-entity>
@@ -475,7 +472,6 @@
           animation__float4="property: position; to: -0.25 0.55 0.25; dur: 3800; dir: alternate; loop: true"></a-sphere>
       </a-entity>
 
-      
       <!-- ====== DÉCORATION SCÈNE B ====== -->
       
       <!-- Flaque de sang décorative (rappel Pulp Fiction) -->
@@ -838,7 +834,7 @@
                   }
                   if (pistolHitboxReset) {
                     pistolHitboxReset.classList.add('clickable');
-                    pistolHitboxReset.setAttribute('position', '0 0.2 0.1');
+                    pistolHitboxReset.setAttribute('position', '0 0.05 0');
                   }
                   if (pistolLightReset) {
                     pistolLightReset.removeAttribute('animation__glow');
@@ -864,7 +860,7 @@
                   }
                   if (keyHitboxReset) {
                     keyHitboxReset.classList.add('clickable');
-                    keyHitboxReset.setAttribute('position', '0 0.2 0.1');
+                    keyHitboxReset.setAttribute('position', '0.1 -0.05 0');
                   }
                   if (keyLightReset) {
                     keyLightReset.removeAttribute('animation__glow');
