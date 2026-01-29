@@ -149,7 +149,11 @@
       constrain-position="min: -1.7 0 -1.7; max: 1.7 0 1.7">
 
       <a-camera id="cam" position="0 1.6 0" look-controls="enabled: true; pointerLockEnabled: true">
-        <a-entity id="desktop-cursor" cursor="fuse: false; rayOrigin: mouse" raycaster="objects: .clickable; far: 10">
+        <!-- Curseur desktop uniquement (caché en VR) -->
+        <a-entity id="desktop-cursor" 
+                  cursor="fuse: false; rayOrigin: mouse" 
+                  raycaster="objects: .clickable; far: 10"
+                  visible="true">
         </a-entity>
 
         <a-plane id="black-out" position="0 0 -0.3" width="6" height="6"
@@ -211,12 +215,17 @@
 
       </a-camera>
 
-      <a-entity id="left-hand" laser-controls="hand: left; model: true; defaultModelColor: #FFD700"
-        raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
+      <!-- Manettes VR - SANS raycaster/laser-controls redondants -->
+      <a-entity id="left-hand" 
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #FFD700"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5; showLine: true">
       </a-entity>
 
-      <a-entity id="right-hand" laser-controls="hand: right; model: true; defaultModelColor: #FFD700"
-        raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5" vr-click-handler>
+      <a-entity id="right-hand" 
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #FFD700"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 10; lineColor: #FFD700; lineOpacity: 0.5; showLine: true">
       </a-entity>
 
     </a-entity>
@@ -548,34 +557,7 @@
       location.reload();
     }
 
-    AFRAME.registerComponent('vr-click-handler', {
-      init: function () {
-        const el = this.el;
-        el.addEventListener('triggerdown', this.onClick.bind(this));
-        el.addEventListener('selectstart', this.onClick.bind(this));
-        el.addEventListener('raycaster-intersection', (evt) => {
-          const target = evt.detail.els[0];
-          if (target && target.classList.contains('clickable')) {
-            el.setAttribute('raycaster', 'lineColor', '#00FF00');
-          }
-        });
-        el.addEventListener('raycaster-intersection-cleared', () => {
-          el.setAttribute('raycaster', 'lineColor', '#FFD700');
-        });
-      },
-      onClick: function () {
-        const raycaster = this.el.components.raycaster;
-        if (!raycaster) return;
-        const intersections = raycaster.intersections;
-        if (intersections.length > 0) {
-          const target = intersections[0].object.el;
-          if (target && target.classList.contains('clickable')) {
-            target.emit('click');
-          }
-        }
-      }
-    });
-
+    // Composant pour contraindre la position du joueur
     AFRAME.registerComponent('constrain-position', {
       schema: {
         min: { type: 'vec3', default: { x: -1.7, y: 0, z: -1.7 } },
@@ -611,7 +593,6 @@
         updateDebug('🥽 VR: Gâchette');
 
         const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
-        const desktopCursor = document.querySelector('#desktop-cursor');
         const blackOut = document.querySelector('#black-out');
         const sceneA = document.querySelector('#scene-a');
         const sceneB = document.querySelector('#scene-b');
@@ -1041,98 +1022,49 @@
           }, 1500);
         }
 
-        // Clic sur le pistolet (hitbox)
-        const pistolHitbox = document.querySelector('#pistol-hitbox');
-        if (pistolHitbox) {
-          pistolHitbox.addEventListener('click', () => {
-            updateDebug('🔫 Clic pistolet');
-            activatePistol();
-          });
-        }
-
-        // Clic sur la clé (hitbox)
-        const keyHitbox = document.querySelector('#key-hitbox');
-        if (keyHitbox) {
-          keyHitbox.addEventListener('click', () => {
-            updateDebug('🔑 Clic clé');
-            activateKey();
-          });
-        }
-
-        // Clic sur le bouton restart (scène C)
-        const restartHitbox = document.querySelector('#restart-hitbox');
-        if (restartHitbox) {
-          restartHitbox.addEventListener('click', () => {
-            updateDebug('🔄 Restart cliqué');
-            resetExperience();
-          });
-        }
-
-        // Milkshake click
-        milkshakeHitbox.addEventListener('click', () => {
-          updateDebug('🥤 Click direct hitbox');
-          transitionToSceneB();
-        });
-
-        if (desktopCursor) {
-          desktopCursor.addEventListener('click', (evt) => {
-            const intersectedEl = evt.detail?.intersectedEl;
-            
-            // Vérifier milkshake
-            if (!globalTransitionDone && intersectedEl && intersectedEl.id === 'milkshake-hitbox') {
-              transitionToSceneB();
-            }
-            
-            // Vérifier pistolet
-            if (!globalPistolActivated && intersectedEl && intersectedEl.id === 'pistol-hitbox') {
-              activatePistol();
-            }
-            
-            // Vérifier clé
-            if (!globalKeyActivated && intersectedEl && intersectedEl.id === 'key-hitbox') {
-              activateKey();
-            }
-            
-            // Vérifier bouton restart
-            if (intersectedEl && intersectedEl.id === 'restart-hitbox') {
-              resetExperience();
-            }
-          });
-        }
-
-        document.addEventListener('click', (evt) => {
-          if (document.getElementById('start-experience').style.display !== 'none') return;
-          
-          const cam = document.querySelector('#cam');
-          if (cam && cam.components.raycaster) {
-            const intersections = cam.components.raycaster.intersections;
-            if (intersections && intersections.length > 0) {
-              const hit = intersections[0].object.el;
-              
-              if (!globalTransitionDone && hit && hit.id === 'milkshake-hitbox') {
+        // ========== SYSTÈME D'INTERACTION UNIFIÉ ==========
+        // Un seul gestionnaire pour tous les clics (desktop ET VR)
+        
+        function handleInteraction(targetId) {
+          switch(targetId) {
+            case 'milkshake-hitbox':
+              if (!globalTransitionDone) {
+                updateDebug('🥤 Milkshake cliqué');
                 transitionToSceneB();
               }
-              
-              if (!globalPistolActivated && hit && hit.id === 'pistol-hitbox') {
+              break;
+            case 'pistol-hitbox':
+              if (!globalPistolActivated) {
+                updateDebug('🔫 Pistolet cliqué');
                 activatePistol();
               }
-              
-              if (!globalKeyActivated && hit && hit.id === 'key-hitbox') {
+              break;
+            case 'key-hitbox':
+              if (!globalKeyActivated) {
+                updateDebug('🔑 Clé cliquée');
                 activateKey();
               }
-              
-              // Bouton restart
-              if (hit && hit.id === 'restart-hitbox') {
-                resetExperience();
-              }
-            }
+              break;
+            case 'restart-hitbox':
+              updateDebug('🔄 Restart cliqué');
+              resetExperience();
+              break;
           }
+        }
+
+        // Écouter les clics sur les éléments clickable directement
+        document.querySelectorAll('.clickable').forEach(el => {
+          el.addEventListener('click', function(evt) {
+            evt.stopPropagation(); // Éviter la propagation multiple
+            handleInteraction(this.id);
+          });
         });
 
+        // Gestion VR/Desktop
         scene.addEventListener('enter-vr', () => {
           updateDebug('🥽 Mode VR activé');
           if (vrHelp) vrHelp.setAttribute('visible', 'true');
-          document.querySelector('#desktop-cursor')?.setAttribute('visible', 'false');
+          document.querySelector('#desktop-cursor')?.setAttribute('raycaster', 'enabled', false);
           if (music.paused) {
             music.volume = musicVolume;
             music.play().catch(e => console.warn('Audio VR:', e));
@@ -1142,7 +1074,7 @@
         scene.addEventListener('exit-vr', () => {
           updateDebug('🖥️ Mode Desktop');
           if (vrHelp) vrHelp.setAttribute('visible', 'false');
-          document.querySelector('#desktop-cursor')?.setAttribute('visible', 'true');
+          document.querySelector('#desktop-cursor')?.setAttribute('raycaster', 'enabled', true);
         });
 
         updateDebug('─────────────────');
