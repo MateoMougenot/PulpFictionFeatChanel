@@ -190,8 +190,9 @@
           
           <!-- Bouton Recommencer -->
           <a-entity id="restart-button" position="0 -0.3 0.01">
-            <!-- Fond du bouton -->
+            <!-- Fond du bouton (clickable) -->
             <a-plane id="restart-btn-bg" 
+                     class="clickable"
                      width="0.6" height="0.15"
                      material="color: #000000; shader: flat">
             </a-plane>
@@ -203,12 +204,6 @@
                     scale="0.2 0.2 0.2"
                     width="3">
             </a-text>
-            <!-- Hitbox pour le clic -->
-            <a-box id="restart-hitbox"
-                   class="clickable"
-                   position="0 0 0.05"
-                   width="0.7" height="0.25" depth="0.1"
-                   material="opacity: 0.001; transparent: true; side: double"></a-box>
           </a-entity>
           
         </a-entity>
@@ -316,13 +311,9 @@
 
       <!-- MILKSHAKE -->
       <a-entity id="trigger-milkshake" position="0 0.58 1.2">
-        <a-entity id="milkshake-glb" gltf-model="#milkshake-model" position="0 0.2 0" scale="0.13 0.13 0.13"></a-entity>
+        <a-entity id="milkshake-glb" class="clickable" gltf-model="#milkshake-model" position="0 0.2 0" scale="0.13 0.13 0.13"></a-entity>
         <a-light type="point" intensity="0.8" distance="2" color="#FFB6C1"></a-light>
       </a-entity>
-
-      <!-- HITBOX -->
-      <a-box id="milkshake-hitbox" class="clickable" position="0 0.85 1.2" width="0.3" height="0.5" depth="0.3"
-        material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
 
       <!-- NÉONS PLAFOND -->
       <a-entity position="0 3.95 -1.8">
@@ -393,17 +384,12 @@
       <!-- PISTOLET INTERACTIF (mallette 1) -->
       <a-entity id="pistol-container" position="-0.6 0.6 -0.8">
         <a-entity id="pistol-model-b" 
+                  class="clickable"
                   gltf-model="#pistol-model" 
                   position="0 0 0" 
                   rotation="90 -215.700 0"
                   scale="0.08 0.08 0.08">
         </a-entity>
-        <!-- Hitbox ajustée au pistolet -->
-        <a-box id="pistol-hitbox" 
-               class="clickable" 
-               position="0 0.05 0" 
-               width="0.35" height="0.25" depth="0.2"
-               material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="pistol-light" type="point" intensity="0.3" distance="1" color="#FF4444" position="0 0.05 0"></a-light>
       </a-entity>
 
@@ -428,17 +414,12 @@
       <!-- CLÉ DORÉE INTERACTIVE (mallette 2) -->
       <a-entity id="key-container" position="0.6 0.65 -0.8">
         <a-entity id="key-model" 
+                  class="clickable"
                   gltf-model="#golden-key-model" 
                   position="0.1 -0.1 0" 
                   rotation="0 0 0"
                   scale="0.0005 0.0005 0.0005">
         </a-entity>
-        <!-- Hitbox ajustée à la clé -->
-        <a-box id="key-hitbox" 
-               class="clickable" 
-               position="0.1 -0.05 0" 
-               width="0.3" height="0.2" depth="0.15"
-               material="opacity: 0.001; transparent: true; side: double; depthTest: false"></a-box>
         <a-light id="key-light" type="point" intensity="0.5" distance="1.5" color="#FFD700" position="0 0.05 0"></a-light>
       </a-entity>
 
@@ -592,7 +573,7 @@
         updateDebug('🎮 Desktop: ZQSD + clic');
         updateDebug('🥽 VR: Gâchette');
 
-        const milkshakeHitbox = document.querySelector('#milkshake-hitbox');
+        const milkshakeGlb = document.querySelector('#milkshake-glb');
         const blackOut = document.querySelector('#black-out');
         const sceneA = document.querySelector('#scene-a');
         const sceneB = document.querySelector('#scene-b');
@@ -615,7 +596,7 @@
 
           if (instructions) instructions.innerHTML = 'THE MYSTERY';
           if (controls) controls.style.display = 'none';
-          milkshakeHitbox.classList.remove('clickable');
+          milkshakeGlb.classList.remove('clickable');
 
           blackOut.setAttribute('visible', 'true');
           blackOut.setAttribute('animation__fadeIn', {
@@ -682,15 +663,14 @@
           const pistolContainer = document.querySelector('#pistol-container');
           const pistolModel = document.querySelector('#pistol-model-b');
           const pistolLight = document.querySelector('#pistol-light');
-          const pistolHitbox = document.querySelector('#pistol-hitbox');
           
           if (!pistolContainer || !pistolModel) {
             console.warn('Pistolet non trouvé');
             return;
           }
           
-          // Retirer la classe clickable
-          if (pistolHitbox) pistolHitbox.classList.remove('clickable');
+          // Retirer la classe clickable du modèle
+          pistolModel.classList.remove('clickable');
           
           // Intensifier la lumière
           if (pistolLight) {
@@ -794,13 +774,12 @@
                   globalPistolActivated = false;
                   globalKeyActivated = false;
                   
-                  // Réactiver la hitbox du milkshake
-                  milkshakeHitbox.classList.add('clickable');
+                  // Réactiver le milkshake
+                  milkshakeGlb.classList.add('clickable');
                   
                   // Réinitialiser le pistolet (position et rotation)
                   const pistolContainerReset = document.querySelector('#pistol-container');
                   const pistolModelReset = document.querySelector('#pistol-model-b');
-                  const pistolHitboxReset = document.querySelector('#pistol-hitbox');
                   const pistolLightReset = document.querySelector('#pistol-light');
                   
                   if (pistolContainerReset) {
@@ -812,10 +791,7 @@
                     pistolModelReset.removeAttribute('animation__straighten');
                     pistolModelReset.removeAttribute('animation__spin');
                     pistolModelReset.setAttribute('rotation', '90 -215.700 0');
-                  }
-                  if (pistolHitboxReset) {
-                    pistolHitboxReset.classList.add('clickable');
-                    pistolHitboxReset.setAttribute('position', '0 0.05 0');
+                    pistolModelReset.classList.add('clickable');
                   }
                   if (pistolLightReset) {
                     pistolLightReset.removeAttribute('animation__glow');
@@ -825,7 +801,6 @@
                   // Réinitialiser la clé (position et rotation)
                   const keyContainerReset = document.querySelector('#key-container');
                   const keyModelReset = document.querySelector('#key-model');
-                  const keyHitboxReset = document.querySelector('#key-hitbox');
                   const keyLightReset = document.querySelector('#key-light');
                   
                   if (keyContainerReset) {
@@ -838,10 +813,7 @@
                     keyModelReset.removeAttribute('animation__spin');
                     keyModelReset.setAttribute('position', '0.1 -0.1 0');
                     keyModelReset.setAttribute('rotation', '0 0 0');
-                  }
-                  if (keyHitboxReset) {
-                    keyHitboxReset.classList.add('clickable');
-                    keyHitboxReset.setAttribute('position', '0.1 -0.05 0');
+                    keyModelReset.classList.add('clickable');
                   }
                   if (keyLightReset) {
                     keyLightReset.removeAttribute('animation__glow');
@@ -901,15 +873,14 @@
           const keyContainer = document.querySelector('#key-container');
           const keyModel = document.querySelector('#key-model');
           const keyLight = document.querySelector('#key-light');
-          const keyHitbox = document.querySelector('#key-hitbox');
           
           if (!keyContainer || !keyModel) {
             console.warn('Clé non trouvée');
             return;
           }
           
-          // Retirer la classe clickable
-          if (keyHitbox) keyHitbox.classList.remove('clickable');
+          // Retirer la classe clickable du modèle
+          keyModel.classList.remove('clickable');
           
           // Intensifier la lumière
           if (keyLight) {
@@ -1027,25 +998,25 @@
         
         function handleInteraction(targetId) {
           switch(targetId) {
-            case 'milkshake-hitbox':
+            case 'milkshake-glb':
               if (!globalTransitionDone) {
                 updateDebug('🥤 Milkshake cliqué');
                 transitionToSceneB();
               }
               break;
-            case 'pistol-hitbox':
+            case 'pistol-model-b':
               if (!globalPistolActivated) {
                 updateDebug('🔫 Pistolet cliqué');
                 activatePistol();
               }
               break;
-            case 'key-hitbox':
+            case 'key-model':
               if (!globalKeyActivated) {
                 updateDebug('🔑 Clé cliquée');
                 activateKey();
               }
               break;
-            case 'restart-hitbox':
+            case 'restart-btn-bg':
               updateDebug('🔄 Restart cliqué');
               resetExperience();
               break;
