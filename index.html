@@ -596,6 +596,24 @@
 
     // Fonction de reset complète (utilisée par le bouton VR)
     function resetExperience() {
+      // Arrêter tous les sons avant le reload
+      if (music && !music.paused) {
+        music.pause();
+        music.volume = 0;
+      }
+      if (urgeOverkill && !urgeOverkill.paused) {
+        urgeOverkill.pause();
+        urgeOverkill.volume = 0;
+      }
+      if (vinylDust && !vinylDust.paused) {
+        vinylDust.pause();
+        vinylDust.volume = 0;
+      }
+      if (gunSound && !gunSound.paused) {
+        gunSound.pause();
+        gunSound.volume = 0;
+      }
+      
       // Rafraîchir la page pour tout réinitialiser proprement
       location.reload();
     }
@@ -818,6 +836,16 @@
             updateDebug('🎸 Fondu musique...');
           }
           
+          // SÉCURITÉ Quest 3: Forcer l'arrêt après 2 secondes si le fondu n'a pas marché
+          setTimeout(() => {
+            if (urgeOverkill && !urgeOverkill.paused) {
+              urgeOverkill.pause();
+              urgeOverkill.volume = 0;
+              urgeOverkill.currentTime = 0;
+              console.log('🎸 Sécurité: Urge-Overkill forcé à s\'arrêter');
+            }
+          }, 2100);
+          
           // SON INSTANTANÉ
           if (gunSound) {
             gunSound.volume = 0.8;
@@ -990,6 +1018,13 @@
                   mysteryText.removeAttribute('animation__appear');
                   mysteryText.setAttribute('opacity', '0');
                   
+                  // FORCER l'arrêt de Urge-Overkill avant de relancer You Never Can Tell
+                  if (urgeOverkill && !urgeOverkill.paused) {
+                    urgeOverkill.pause();
+                    urgeOverkill.volume = 0;
+                    urgeOverkill.currentTime = 0;
+                  }
+                  
                   // Relancer la musique
                   music.volume = musicVolume;
                   music.currentTime = 0;
@@ -1041,6 +1076,16 @@
             fadeOutAudio(urgeOverkill, 2000);
             updateDebug('🎸 Fondu musique...');
           }
+          
+          // SÉCURITÉ Quest 3: Forcer l'arrêt après 2 secondes si le fondu n'a pas marché
+          setTimeout(() => {
+            if (urgeOverkill && !urgeOverkill.paused) {
+              urgeOverkill.pause();
+              urgeOverkill.volume = 0;
+              urgeOverkill.currentTime = 0;
+              console.log('🎸 Sécurité: Urge-Overkill forcé à s\'arrêter');
+            }
+          }, 2100);
           
           const keyContainer = document.querySelector('#key-container');
           const keyModel = document.querySelector('#key-model');
