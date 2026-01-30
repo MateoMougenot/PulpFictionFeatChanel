@@ -528,90 +528,32 @@
     let globalKeyActivated = false;
 
     // Fonction générique pour faire un fondu sur n'importe quel audio
-    // function fadeOutAudio(audioElement, duration = 1500, callback) {
-    //   if (!audioElement || audioElement.paused) {
-    //     if (callback) callback();
-    //     return;
-    //   }
-
-    //   const startVolume = audioElement.volume;
-    //   const startTime = Date.now();
-
-    //   function fade() {
-    //     const elapsed = Date.now() - startTime;
-    //     const progress = Math.min(elapsed / duration, 1);
-    //     audioElement.volume = startVolume * Math.pow(1 - progress, 2);
-
-    //     if (progress < 1) {
-    //       requestAnimationFrame(fade);
-    //     } else {
-    //       audioElement.pause();
-    //       audioElement.volume = 0;
-    //       audioElement.currentTime = 0;
-    //       if (callback) callback();
-    //     }
-    //   }
-    //   fade();
-    // }
-
-
-    // Fonction générique pour faire un fondu sur n'importe quel audio (Version Corrigée Quest 3)
     function fadeOutAudio(audioElement, duration = 1500, callback) {
-      // Vérification de base
       if (!audioElement || audioElement.paused) {
         if (callback) callback();
         return;
       }
 
-      // Marqueur pour éviter les conflits
-      let isFinished = false;
-
       const startVolume = audioElement.volume;
       const startTime = Date.now();
 
-      // Fonction d'arrêt propre appelée soit par l'animation, soit par la sécurité
-      function stopAudio() {
-        if (isFinished) return; // Déjà arrêté
-        isFinished = true;
-
-        audioElement.pause();
-        audioElement.volume = 0;
-        audioElement.currentTime = 0;
-        
-        console.log(`🔇 Audio ${audioElement.id} arrêté proprement.`);
-        if (callback) callback();
-      }
-
-      // 1. Boucle d'animation (pour la fluidité si tout va bien)
       function fade() {
-        if (isFinished) return;
-
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Calcul du volume
-        audioElement.volume = Math.max(0, startVolume * Math.pow(1 - progress, 2));
+        audioElement.volume = startVolume * Math.pow(1 - progress, 2);
 
         if (progress < 1) {
           requestAnimationFrame(fade);
         } else {
-          stopAudio(); // Fin normale
+          audioElement.pause();
+          audioElement.volume = 0;
+          audioElement.currentTime = 0;
+          if (callback) callback();
         }
       }
       fade();
-
-      // 2. SÉCURITÉ : Force l'arrêt si le Quest lag
-      setTimeout(() => {
-        if (!isFinished) {
-          console.warn(`⚠️ Arrêt forcé de ${audioElement.id} (Lag détecté)`);
-          stopAudio();
-        }
-      }, duration + 50); // 50ms de marge
     }
 
-
-
-    
     function fadeOutMusic(duration = 1500) {
       console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
 
@@ -713,11 +655,21 @@
           updateDebug('🎵 Fondu musical...');
 
           fadeOutMusic(4000); // Fondu musical plus long
+          
+          // SÉCURITÉ Quest 3: Forcer l'arrêt après 4 secondes si le fondu n'a pas marché
+          setTimeout(() => {
+            if (music && !music.paused) {
+              music.pause();
+              music.volume = 0;
+              music.currentTime = 0;
+              console.log('🎵 Sécurité: You Never Can Tell forcé à s\'arrêter');
+            }
+          }, 4100);
 
           // Lancer le son vinyl-dust immédiatement
           if (vinylDust) {
             vinylDust.currentTime = 0;
-            vinylDust.volume = 1;
+            vinylDust.volume = 0.5;
             vinylDust.play().catch(e => console.warn('Audio vinyl-dust:', e));
             updateDebug('💿 Vinyl dust...');
           }
@@ -780,12 +732,20 @@
                 easing: 'easeInBack'
               });
               
+              // FORCER l'arrêt de You Never Can Tell avant de lancer Urge-Overkill
+              if (music && !music.paused) {
+                music.pause();
+                music.volume = 0;
+                music.currentTime = 0;
+                console.log('🎵 You Never Can Tell forcé à s\'arrêter');
+              }
+              
               // Lancer Urge-Overkill quand le disque commence à disparaître
               if (urgeOverkill) {
                 urgeOverkill.currentTime = 0;
                 urgeOverkill.volume = urgeVolume;
                 urgeOverkill.play().catch(e => console.warn('Audio Urge-Overkill:', e));
-                updateDebug('🎸 Girl, you\'ll be a woman soon...');
+                updateDebug('🎸 Urge Overkill...');
               }
               
               // Cacher le disque après l'animation
