@@ -132,10 +132,6 @@
     <source src="./assets/song/vinyl-dust.mp3" type="audio/mpeg">
   </audio>
 
-  <audio id="urge-overkill" loop preload="auto">
-    <source src="./assets/song/Urge-Overkill.mp3" type="audio/mpeg">
-  </audio>
-
   <a-scene vr-mode-ui="enabled: true">
 
     <a-assets>
@@ -151,8 +147,11 @@
       <a-asset-item id="valise-model" src="./assets/models/valise.glb"></a-asset-item>
       <a-asset-item id="golden-key-model" src="./assets/models/the_golden_key.glb"></a-asset-item>
       <a-asset-item id="disc-model" src="./assets/models/disc.glb"></a-asset-item>
+      <a-asset-item id="jukebox-model" src="./assets/models/jukebox.glb"></a-asset-item>
       <!-- Image pour la scène B -->
       <img id="chanel-marilyn-img" src="./assets/images/Chanel-Marilyn-Monroe.jpg" crossorigin="anonymous">
+      <!-- Audio pour le son spatialisé du jukebox -->
+      <audio id="urge-overkill-asset" src="./assets/song/Urge-Overkill.mp3" preload="auto"></audio>
     </a-assets>
 
     <!-- CAMERA RIG -->
@@ -505,6 +504,24 @@
         <a-light type="spot" color="#FFFAF0" intensity="0.8" distance="3" angle="25" penumbra="0.3"
           position="0 1 0.5" rotation="-30 0 0"></a-light>
       </a-entity>
+      
+      <!-- Jukebox avec son spatialisé -->
+      <a-entity id="jukebox" position="-1.5 0 -1.5" rotation="0 -55 0">
+        <a-entity gltf-model="#jukebox-model" scale="0.8 0.8 0.8"></a-entity>
+        <!-- Son spatialisé provenant du jukebox -->
+        <a-sound id="jukebox-sound" 
+                 src="#urge-overkill-asset" 
+                 autoplay="false" 
+                 loop="true"
+                 volume="1"
+                 positional="true"
+                 ref-distance="1"
+                 max-distance="10"
+                 rolloff-factor="1">
+        </a-sound>
+        <!-- Lumière d'ambiance du jukebox -->
+        <a-light type="point" color="#FF4500" intensity="0.5" distance="2" position="0 1 0"></a-light>
+      </a-entity>
            
       <!-- Néon décoratif au plafond -->
       <a-box position="0 3.9 -0.8" width="2" height="0.05" depth="0.05"
@@ -518,9 +535,7 @@
     const music = document.getElementById('twist-music');
     const gunSound = document.getElementById('gun-sound');
     const vinylDust = document.getElementById('vinyl-dust');
-    const urgeOverkill = document.getElementById('urge-overkill');
     const musicVolume = 0.3;
-    const urgeVolume = 0.4;
     
     // Variables d'état globales pour permettre le reset
     let globalTransitionDone = false;
@@ -584,6 +599,7 @@
 
     document.getElementById('start-experience').addEventListener('click', () => {
       document.getElementById('start-experience').style.display = 'none';
+      music.currentTime = 0;
       music.volume = musicVolume;
       music.play().then(() => {
         console.log('🎵 Musique lancée avec succès');
@@ -601,9 +617,10 @@
         music.pause();
         music.volume = 0;
       }
-      if (urgeOverkill && !urgeOverkill.paused) {
-        urgeOverkill.pause();
-        urgeOverkill.volume = 0;
+      // Arrêter le son du jukebox
+      const jukeboxSound = document.querySelector('#jukebox-sound');
+      if (jukeboxSound && jukeboxSound.components.sound) {
+        jukeboxSound.components.sound.stopSound();
       }
       if (vinylDust && !vinylDust.paused) {
         vinylDust.pause();
@@ -758,12 +775,11 @@
                 console.log('🎵 You Never Can Tell forcé à s\'arrêter');
               }
               
-              // Lancer Urge-Overkill quand le disque commence à disparaître
-              if (urgeOverkill) {
-                urgeOverkill.currentTime = 0;
-                urgeOverkill.volume = urgeVolume;
-                urgeOverkill.play().catch(e => console.warn('Audio Urge-Overkill:', e));
-                updateDebug('🎸 Urge Overkill...');
+              // Lancer le son spatialisé du jukebox
+              const jukeboxSound = document.querySelector('#jukebox-sound');
+              if (jukeboxSound) {
+                jukeboxSound.components.sound.playSound();
+                updateDebug('🎸 Jukebox: Urge Overkill...');
               }
               
               // Cacher le disque après l'animation
@@ -830,21 +846,12 @@
           
           updateDebug('🔫 Pistolet activé !');
           
-          // Fondu de Urge-Overkill
-          if (urgeOverkill && !urgeOverkill.paused) {
-            fadeOutAudio(urgeOverkill, 2000);
-            updateDebug('🎸 Fondu musique...');
+          // Arrêter le son du jukebox
+          const jukeboxSound = document.querySelector('#jukebox-sound');
+          if (jukeboxSound && jukeboxSound.components.sound) {
+            jukeboxSound.components.sound.stopSound();
+            updateDebug('🎸 Jukebox arrêté');
           }
-          
-          // SÉCURITÉ Quest 3: Forcer l'arrêt après 2 secondes si le fondu n'a pas marché
-          setTimeout(() => {
-            if (urgeOverkill && !urgeOverkill.paused) {
-              urgeOverkill.pause();
-              urgeOverkill.volume = 0;
-              urgeOverkill.currentTime = 0;
-              console.log('🎸 Sécurité: Urge-Overkill forcé à s\'arrêter');
-            }
-          }, 2100);
           
           // SON INSTANTANÉ
           if (gunSound) {
@@ -1018,11 +1025,10 @@
                   mysteryText.removeAttribute('animation__appear');
                   mysteryText.setAttribute('opacity', '0');
                   
-                  // FORCER l'arrêt de Urge-Overkill avant de relancer You Never Can Tell
-                  if (urgeOverkill && !urgeOverkill.paused) {
-                    urgeOverkill.pause();
-                    urgeOverkill.volume = 0;
-                    urgeOverkill.currentTime = 0;
+                  // Arrêter le son du jukebox avant de relancer You Never Can Tell
+                  const jukeboxSoundReset = document.querySelector('#jukebox-sound');
+                  if (jukeboxSoundReset && jukeboxSoundReset.components.sound) {
+                    jukeboxSoundReset.components.sound.stopSound();
                   }
                   
                   // Relancer la musique
@@ -1071,21 +1077,12 @@
           
           updateDebug('🔑 Clé activée !');
           
-          // Fondu de Urge-Overkill
-          if (urgeOverkill && !urgeOverkill.paused) {
-            fadeOutAudio(urgeOverkill, 2000);
-            updateDebug('🎸 Fondu musique...');
+          // Arrêter le son du jukebox
+          const jukeboxSound = document.querySelector('#jukebox-sound');
+          if (jukeboxSound && jukeboxSound.components.sound) {
+            jukeboxSound.components.sound.stopSound();
+            updateDebug('🎸 Jukebox arrêté');
           }
-          
-          // SÉCURITÉ Quest 3: Forcer l'arrêt après 2 secondes si le fondu n'a pas marché
-          setTimeout(() => {
-            if (urgeOverkill && !urgeOverkill.paused) {
-              urgeOverkill.pause();
-              urgeOverkill.volume = 0;
-              urgeOverkill.currentTime = 0;
-              console.log('🎸 Sécurité: Urge-Overkill forcé à s\'arrêter');
-            }
-          }, 2100);
           
           const keyContainer = document.querySelector('#key-container');
           const keyModel = document.querySelector('#key-model');
