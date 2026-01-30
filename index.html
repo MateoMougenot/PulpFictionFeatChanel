@@ -558,28 +558,54 @@
       console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
 
       if (!music || music.paused) {
-        console.log('🎵 Musique déjà en pause ou non trouvée');
         return;
       }
+
+      // Marquer qu'on est en train de couper le son (pour éviter qu'une autre fonction ne le relance)
+      music.dataset.isFading = "true";
 
       const startVolume = music.volume;
       const startTime = Date.now();
 
+      // 1. La boucle d'animation (pour la douceur)
       function fade() {
+        // Si le son a été coupé par le timeout de sécurité, on arrête la boucle
+        if (music.paused) return; 
+
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        music.volume = startVolume * Math.pow(1 - progress, 2);
+        
+        // Formule quadratique pour un fondu plus naturel
+        music.volume = Math.max(0, startVolume * Math.pow(1 - progress, 2));
 
         if (progress < 1) {
           requestAnimationFrame(fade);
         } else {
-          music.pause();
-          music.volume = 0;
-          console.log('🎵 Musique arrêtée');
-          updateDebug('🎵 Musique arrêtée');
+          // Fin normale de la boucle
+          stopMusicFinal();
         }
       }
       fade();
+
+      // 2. LE FILET DE SÉCURITÉ (Force Stop)
+      // On force l'arrêt un tout petit peu après la durée prévue (duration + 100ms)
+      // Cela garantit que même si le Quest lag, le son s'arrêtera.
+      setTimeout(() => {
+        if (!music.paused) {
+           console.log('⚠️ Arrêt forcé par sécurité (Quest lag)');
+           stopMusicFinal();
+        }
+      }, duration + 100);
+
+      // Fonction utilitaire pour couper proprement
+      function stopMusicFinal() {
+        music.pause();
+        music.volume = 0; // S'assurer que le volume est à 0
+        music.currentTime = 0;
+        music.dataset.isFading = "false";
+        console.log('🎵 Musique définitivement arrêtée');
+        updateDebug('🎵 Musique arrêtée');
+      }
     }
 
     document.getElementById('start-experience').addEventListener('click', () => {
