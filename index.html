@@ -128,6 +128,14 @@
     <source src="./assets/song/gun-sound.mp3" type="audio/mpeg">
   </audio>
 
+  <audio id="vinyl-dust" preload="auto">
+    <source src="./assets/song/vinyl-dust.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="urge-overkill" loop preload="auto">
+    <source src="./assets/song/Urge-Overkill.mp3" type="audio/mpeg">
+  </audio>
+
   <a-scene vr-mode-ui="enabled: true">
 
     <a-assets>
@@ -142,6 +150,9 @@
       <a-asset-item id="pistol-model" src="./assets/models/pistol.glb"></a-asset-item>
       <a-asset-item id="valise-model" src="./assets/models/valise.glb"></a-asset-item>
       <a-asset-item id="golden-key-model" src="./assets/models/the_golden_key.glb"></a-asset-item>
+      <a-asset-item id="disc-model" src="./assets/models/disc.glb"></a-asset-item>
+      <!-- Image pour la scène B -->
+      <img id="chanel-marilyn-img" src="./assets/images/Chanel-Marilyn-Monroe.jpg" crossorigin="anonymous">
     </a-assets>
 
     <!-- CAMERA RIG -->
@@ -156,9 +167,18 @@
                   visible="true">
         </a-entity>
 
-        <a-plane id="black-out" position="0 0 -0.3" width="6" height="6"
+        <a-plane id="black-out" position="0 0 -0.5" width="6" height="6"
           material="color: #000; opacity: 0; transparent: true; shader: flat; side: double" visible="false">
         </a-plane>
+
+        <!-- Disque vinyle pour la transition (fixé à la caméra, DEVANT le blackout) -->
+        <a-entity id="transition-disc" visible="false" position="0 0 -0.4">
+          <a-entity id="disc-model-entity" 
+                    gltf-model="#disc-model" 
+                    rotation="90 0 0" 
+                    scale="0.05 0.05 0.05">
+          </a-entity>
+        </a-entity>
 
         <!-- ========== ÉCRAN FINAL CHANEL (fixé à la caméra) ========== -->
         <a-entity id="chanel-screen" visible="false" position="0 0 -0.8">
@@ -473,6 +493,18 @@
       <a-cylinder position="1.8 2 -0.8" radius="0.08" height="4" 
         material="color: #2a0a0a; metalness: 0.6; roughness: 0.4"></a-cylinder>
       
+      <!-- Tableau Chanel Marilyn Monroe sur le mur du fond -->
+      <a-entity position="2 1.8 0.5" rotation="0 -90 0" scale="0.6 0.6 0.6">
+        <!-- Cadre doré -->
+        <a-box width="1.1" height="1.4" depth="0.05"
+          material="color: #8B7355; metalness: 0.8; roughness: 0.2"></a-box>
+        <!-- Image -->
+        <a-plane width="1.0" height="1.3" position="0 0 0.03"
+          material="src: #chanel-marilyn-img; shader: flat"></a-plane>
+        <!-- Lumière spot sur le tableau -->
+        <a-light type="spot" color="#FFFAF0" intensity="0.8" distance="3" angle="25" penumbra="0.3"
+          position="0 1 0.5" rotation="-30 0 0"></a-light>
+      </a-entity>
            
       <!-- Néon décoratif au plafond -->
       <a-box position="0 3.9 -0.8" width="2" height="0.05" depth="0.05"
@@ -485,12 +517,42 @@
   <script>
     const music = document.getElementById('twist-music');
     const gunSound = document.getElementById('gun-sound');
+    const vinylDust = document.getElementById('vinyl-dust');
+    const urgeOverkill = document.getElementById('urge-overkill');
     const musicVolume = 0.3;
+    const urgeVolume = 0.4;
     
     // Variables d'état globales pour permettre le reset
     let globalTransitionDone = false;
     let globalPistolActivated = false;
     let globalKeyActivated = false;
+
+    // Fonction générique pour faire un fondu sur n'importe quel audio
+    function fadeOutAudio(audioElement, duration = 1500, callback) {
+      if (!audioElement || audioElement.paused) {
+        if (callback) callback();
+        return;
+      }
+
+      const startVolume = audioElement.volume;
+      const startTime = Date.now();
+
+      function fade() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        audioElement.volume = startVolume * Math.pow(1 - progress, 2);
+
+        if (progress < 1) {
+          requestAnimationFrame(fade);
+        } else {
+          audioElement.pause();
+          audioElement.volume = 0;
+          audioElement.currentTime = 0;
+          if (callback) callback();
+        }
+      }
+      fade();
+    }
 
     function fadeOutMusic(duration = 1500) {
       console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
@@ -592,57 +654,137 @@
           console.log('🎵 État musique avant fondu - paused:', music.paused, 'volume:', music.volume);
           updateDebug('🎵 Fondu musical...');
 
-          fadeOutMusic(1500);
+          fadeOutMusic(4000); // Fondu musical plus long
+
+          // Lancer le son vinyl-dust immédiatement
+          if (vinylDust) {
+            vinylDust.currentTime = 0;
+            vinylDust.volume = 1;
+            vinylDust.play().catch(e => console.warn('Audio vinyl-dust:', e));
+            updateDebug('💿 Vinyl dust...');
+          }
 
           if (instructions) instructions.innerHTML = 'THE MYSTERY';
           if (controls) controls.style.display = 'none';
           milkshakeGlb.classList.remove('clickable');
 
+          // Récupérer le disque de transition
+          const transitionDisc = document.querySelector('#transition-disc');
+          const discModel = document.querySelector('#disc-model-entity');
+
+          // Réinitialiser le disque pour ce cycle
+          discModel.removeAttribute('animation__spin');
+          discModel.removeAttribute('animation__fadeIn');
+          discModel.removeAttribute('animation__fadeOut');
+          discModel.setAttribute('scale', '0.05 0.05 0.05');
+          discModel.setAttribute('rotation', '90 0 0');
+
+          // Phase 1: Fondu au BLANC (1.5 secondes)
+          blackOut.setAttribute('material', 'color', '#FFFFFF');
           blackOut.setAttribute('visible', 'true');
           blackOut.setAttribute('animation__fadeIn', {
-            property: 'material.opacity', from: 0, to: 1, dur: 200, easing: 'easeInQuad'
+            property: 'material.opacity', from: 0, to: 1, dur: 1500, easing: 'easeInQuad'
           });
 
+          // Phase 2: Après le blanc complet, afficher le disque qui tourne
           setTimeout(() => {
-            sceneA.setAttribute('visible', 'false');
-            sceneB.setAttribute('visible', 'true');
-
-            room.setAttribute('material', {
-              color: '#1a0505',
-              metalness: 0.3,
-              roughness: 0.8,
-              side: 'back'
-            });
-
-            floor.setAttribute('material', {
-              color: '#0a0a0a',
-              metalness: 0.7,
-              roughness: 0.3
-            });
-
-            document.querySelector('#rig').object3D.position.set(0, 0, 1.2);
+            // Afficher le disque
+            transitionDisc.setAttribute('visible', 'true');
             
-            // Faire tourner le rig de 180° pour faire face aux mallettes
-            document.querySelector('#rig').object3D.rotation.y = Math.PI; // 180° en radians
-
+            // Animation d'apparition du disque (scale up)
+            discModel.setAttribute('animation__fadeIn', {
+              property: 'scale',
+              from: '0.05 0.05 0.05',
+              to: '0.2 0.2 0.2',
+              dur: 1000,
+              easing: 'easeOutBack'
+            });
+            
+            // Animation de rotation du disque (tourne sur lui-même comme sur une platine)
+            discModel.setAttribute('animation__spin', {
+              property: 'rotation',
+              from: '90 0 0',
+              to: '90 360 0',
+              dur: 2000,
+              loop: true,
+              easing: 'linear'
+            });
+            
+            updateDebug('💿 Disque en rotation...');
+            
+            // Phase 3: Après 3s de rotation, faire disparaître le disque progressivement
             setTimeout(() => {
-              blackOut.setAttribute('animation__fadeOut', {
-                property: 'material.opacity', from: 1, to: 0, dur: 2000, easing: 'easeOutCubic'
+              // Arrêter la rotation et faire disparaître
+              discModel.setAttribute('animation__fadeOut', {
+                property: 'scale',
+                to: '0.05 0.05 0.05',
+                dur: 800,
+                easing: 'easeInBack'
               });
+              
+              // Lancer Urge-Overkill quand le disque commence à disparaître
+              if (urgeOverkill) {
+                urgeOverkill.currentTime = 0;
+                urgeOverkill.volume = urgeVolume;
+                urgeOverkill.play().catch(e => console.warn('Audio Urge-Overkill:', e));
+                updateDebug('🎸 Girl, you\'ll be a woman soon...');
+              }
+              
+              // Cacher le disque après l'animation
               setTimeout(() => {
-                mysteryText.setAttribute('animation__appear', {
-                  property: 'opacity', from: 0, to: 1, dur: 2500, easing: 'easeOutQuad'
+                transitionDisc.setAttribute('visible', 'false');
+                discModel.removeAttribute('animation__spin');
+                discModel.removeAttribute('animation__fadeIn');
+                discModel.removeAttribute('animation__fadeOut');
+                
+                // Phase 4: Changer de scène pendant que c'est blanc
+                sceneA.setAttribute('visible', 'false');
+                sceneB.setAttribute('visible', 'true');
+
+                room.setAttribute('material', {
+                  color: '#1a0505',
+                  metalness: 0.3,
+                  roughness: 0.8,
+                  side: 'back'
                 });
-              }, 1000);
-              setTimeout(() => {
-                blackOut.setAttribute('visible', 'false');
-                updateDebug('✅ Révélation');
-                updateDebug('💼 Les Mallettes...');
-                updateDebug('🔫 Cliquez sur le pistolet');
-                updateDebug('🔑 Cliquez sur la clé');
-              }, 2100);
-            }, 200);
-          }, 300);
+
+                floor.setAttribute('material', {
+                  color: '#0a0a0a',
+                  metalness: 0.7,
+                  roughness: 0.3
+                });
+
+                document.querySelector('#rig').object3D.position.set(0, 0, 1.2);
+                document.querySelector('#rig').object3D.rotation.y = Math.PI;
+
+                // Phase 5: Fondu sortie du blanc
+                setTimeout(() => {
+                  blackOut.setAttribute('animation__fadeOut', {
+                    property: 'material.opacity', from: 1, to: 0, dur: 2000, easing: 'easeOutCubic'
+                  });
+                  
+                  setTimeout(() => {
+                    mysteryText.setAttribute('animation__appear', {
+                      property: 'opacity', from: 0, to: 1, dur: 2500, easing: 'easeOutQuad'
+                    });
+                  }, 1000);
+                  
+                  setTimeout(() => {
+                    blackOut.setAttribute('visible', 'false');
+                    // Nettoyer les animations du blackOut pour le prochain cycle
+                    blackOut.removeAttribute('animation__fadeIn');
+                    blackOut.removeAttribute('animation__fadeOut');
+                    blackOut.setAttribute('material', 'color', '#000');
+                    blackOut.setAttribute('material', 'opacity', '0');
+                    updateDebug('✅ Révélation');
+                    updateDebug('💼 Les Mallettes...');
+                    updateDebug('🔫 Cliquez sur le pistolet');
+                    updateDebug('🔑 Cliquez sur la clé');
+                  }, 2100);
+                }, 300);
+              }, 900);
+            }, 3000); // Le disque tourne pendant 3 secondes
+          }, 1600); // Attendre que le blanc soit complet
         }
 
         // ====== PISTOLET INTERACTIF - SCÈNE B ======
@@ -651,6 +793,12 @@
           globalPistolActivated = true;
           
           updateDebug('🔫 Pistolet activé !');
+          
+          // Fondu de Urge-Overkill
+          if (urgeOverkill && !urgeOverkill.paused) {
+            fadeOutAudio(urgeOverkill, 2000);
+            updateDebug('🎸 Fondu musique...');
+          }
           
           // SON INSTANTANÉ
           if (gunSound) {
@@ -869,6 +1017,12 @@
           globalKeyActivated = true;
           
           updateDebug('🔑 Clé activée !');
+          
+          // Fondu de Urge-Overkill
+          if (urgeOverkill && !urgeOverkill.paused) {
+            fadeOutAudio(urgeOverkill, 2000);
+            updateDebug('🎸 Fondu musique...');
+          }
           
           const keyContainer = document.querySelector('#key-container');
           const keyModel = document.querySelector('#key-model');
