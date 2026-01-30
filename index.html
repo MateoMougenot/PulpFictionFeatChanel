@@ -528,84 +528,116 @@
     let globalKeyActivated = false;
 
     // Fonction générique pour faire un fondu sur n'importe quel audio
+    // function fadeOutAudio(audioElement, duration = 1500, callback) {
+    //   if (!audioElement || audioElement.paused) {
+    //     if (callback) callback();
+    //     return;
+    //   }
+
+    //   const startVolume = audioElement.volume;
+    //   const startTime = Date.now();
+
+    //   function fade() {
+    //     const elapsed = Date.now() - startTime;
+    //     const progress = Math.min(elapsed / duration, 1);
+    //     audioElement.volume = startVolume * Math.pow(1 - progress, 2);
+
+    //     if (progress < 1) {
+    //       requestAnimationFrame(fade);
+    //     } else {
+    //       audioElement.pause();
+    //       audioElement.volume = 0;
+    //       audioElement.currentTime = 0;
+    //       if (callback) callback();
+    //     }
+    //   }
+    //   fade();
+    // }
+
+
+    // Fonction générique pour faire un fondu sur n'importe quel audio (Version Corrigée Quest 3)
     function fadeOutAudio(audioElement, duration = 1500, callback) {
+      // Vérification de base
       if (!audioElement || audioElement.paused) {
         if (callback) callback();
         return;
       }
 
+      // Marqueur pour éviter les conflits
+      let isFinished = false;
+
       const startVolume = audioElement.volume;
       const startTime = Date.now();
 
-      function fade() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        audioElement.volume = startVolume * Math.pow(1 - progress, 2);
+      // Fonction d'arrêt propre appelée soit par l'animation, soit par la sécurité
+      function stopAudio() {
+        if (isFinished) return; // Déjà arrêté
+        isFinished = true;
 
-        if (progress < 1) {
-          requestAnimationFrame(fade);
-        } else {
-          audioElement.pause();
-          audioElement.volume = 0;
-          audioElement.currentTime = 0;
-          if (callback) callback();
-        }
-      }
-      fade();
-    }
-
-    function fadeOutMusic(duration = 1500) {
-      console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
-
-      if (!music || music.paused) {
-        return;
+        audioElement.pause();
+        audioElement.volume = 0;
+        audioElement.currentTime = 0;
+        
+        console.log(`🔇 Audio ${audioElement.id} arrêté proprement.`);
+        if (callback) callback();
       }
 
-      // Marquer qu'on est en train de couper le son (pour éviter qu'une autre fonction ne le relance)
-      music.dataset.isFading = "true";
-
-      const startVolume = music.volume;
-      const startTime = Date.now();
-
-      // 1. La boucle d'animation (pour la douceur)
+      // 1. Boucle d'animation (pour la fluidité si tout va bien)
       function fade() {
-        // Si le son a été coupé par le timeout de sécurité, on arrête la boucle
-        if (music.paused) return; 
+        if (isFinished) return;
 
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
         
-        // Formule quadratique pour un fondu plus naturel
-        music.volume = Math.max(0, startVolume * Math.pow(1 - progress, 2));
+        // Calcul du volume
+        audioElement.volume = Math.max(0, startVolume * Math.pow(1 - progress, 2));
 
         if (progress < 1) {
           requestAnimationFrame(fade);
         } else {
-          // Fin normale de la boucle
-          stopMusicFinal();
+          stopAudio(); // Fin normale
         }
       }
       fade();
 
-      // 2. LE FILET DE SÉCURITÉ (Force Stop)
-      // On force l'arrêt un tout petit peu après la durée prévue (duration + 100ms)
-      // Cela garantit que même si le Quest lag, le son s'arrêtera.
+      // 2. SÉCURITÉ : Force l'arrêt si le Quest lag
       setTimeout(() => {
-        if (!music.paused) {
-           console.log('⚠️ Arrêt forcé par sécurité (Quest lag)');
-           stopMusicFinal();
+        if (!isFinished) {
+          console.warn(`⚠️ Arrêt forcé de ${audioElement.id} (Lag détecté)`);
+          stopAudio();
         }
-      }, duration + 100);
+      }, duration + 50); // 50ms de marge
+    }
 
-      // Fonction utilitaire pour couper proprement
-      function stopMusicFinal() {
-        music.pause();
-        music.volume = 0; // S'assurer que le volume est à 0
-        music.currentTime = 0;
-        music.dataset.isFading = "false";
-        console.log('🎵 Musique définitivement arrêtée');
-        updateDebug('🎵 Musique arrêtée');
+
+
+    
+    function fadeOutMusic(duration = 1500) {
+      console.log('🎵 fadeOutMusic appelé, music.paused:', music.paused, 'volume:', music.volume);
+
+      if (!music || music.paused) {
+        console.log('🎵 Musique déjà en pause ou non trouvée');
+        return;
       }
+
+      const startVolume = music.volume;
+      const startTime = Date.now();
+
+      function fade() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        music.volume = startVolume * Math.pow(1 - progress, 2);
+
+        if (progress < 1) {
+          requestAnimationFrame(fade);
+        } else {
+          music.pause();
+          music.volume = 0;
+          console.log('🎵 Musique arrêtée');
+          updateDebug('🎵 Musique arrêtée');
+        }
+      }
+      fade();
     }
 
     document.getElementById('start-experience').addEventListener('click', () => {
